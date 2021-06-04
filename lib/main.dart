@@ -1,22 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:pomodoro_flutter/providers/theme.dart';
+import 'package:pomodoro_flutter/models/theme_preferences.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  MyApp({Key key}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeProvider themeChangeProvider = new ThemeProvider();
+
+  @override
+  void initState() { 
+    super.initState();
+    getCurrentAppTheme();
+  }
+
+  void getCurrentAppTheme() async {
+    themeChangeProvider.setTheme = await themeChangeProvider.themePreference.getTheme();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Mi primera App de Flutter', home: Contador());
+    return ChangeNotifierProvider.value(
+      value: themeChangeProvider,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Pomodoro PUCP',
+        home: HomePage(title: 'Pomodoro PUCP'),
+      ),
+    );
   }
 }
 
-class Contador extends StatefulWidget {
+class HomePage extends StatefulWidget {
+  HomePage({Key key, this.title}) : super(key: key);
+  final String title;
+
   @override
-  _ContadorState createState() => _ContadorState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _ContadorState extends State<Contador> {
+class _HomePageState extends State<HomePage> {
   int minutos, segundos;
   @override
   void initState() {
@@ -44,29 +76,84 @@ class _ContadorState extends State<Contador> {
 
   @override
   Widget build(BuildContext context) {
+    final currentTheme = Provider.of<ThemeProvider>(context);
     return Scaffold(
+      backgroundColor: currentTheme.isDarkTheme()
+        ? Color(0xff2a293d)
+        : Colors.white,
       appBar: AppBar(
-        title: Text("App Pomodoro"),
-        backgroundColor: Colors.indigo,
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            color: currentTheme.isDarkTheme()
+            ? Colors.white
+            : Colors.black,
+          ),
+        ),
+        backgroundColor: currentTheme.isDarkTheme()
+          ? Colors.black12
+          : Colors.blue[100],
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Icon(
+                Icons.wb_sunny,
+                color: currentTheme.isDarkTheme()
+                  ? Colors.white
+                  : Colors.black
+              ),
+              Switch(
+                value: currentTheme.isDarkTheme(),
+                onChanged: (value) {
+                  String newTheme = value ? ThemePreference.DARK : ThemePreference.LIGHT;
+                  currentTheme.setTheme = newTheme;
+                }
+              ),
+              Icon(
+                Icons.brightness_2,
+                color: currentTheme.isDarkTheme()
+                  ? Colors.white
+                  : Colors.black
+              )
+            ],
+          )
+        ],
       ),
-      backgroundColor: Colors.lightBlueAccent[100],
       body: Center(
         child: Column(
             children: [
             Text(
-              "Actividad.nombre()",
-              style: TextStyle(fontSize: 35.0),
+              "Actividad.nombre( )",
+              style: TextStyle(
+                fontSize: 35.0,
+                color: currentTheme.isDarkTheme()
+                ? Colors.white
+                : Colors.black,
+              ),
             ),
             Text(
               "$minutos : $segundos",
-              style: TextStyle(fontSize: 60.0),
+              style: TextStyle(
+                fontSize: 60.0,
+                color: currentTheme.isDarkTheme()
+                ? Colors.white
+                : Colors.black,
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FloatingActionButton(
-                  child: Icon(Icons.add_circle_outline),
-                  backgroundColor: Colors.indigo,
+                  child: Icon(
+                    Icons.add_circle_outline,
+                    color: currentTheme.isDarkTheme()
+                    ? Colors.black
+                    : Colors.white,
+                  ),
+                  backgroundColor: currentTheme.isDarkTheme()
+                    ? Colors.blue[200]
+                    : Colors.blue[400],
                   mini: true,
                   elevation: 0,
                   highlightElevation: 0,
@@ -75,8 +162,15 @@ class _ContadorState extends State<Contador> {
                   },
                 ),
                 FloatingActionButton(
-                  child: Icon(Icons.add_circle_outline),
-                  backgroundColor: Colors.indigo,
+                  child: Icon(
+                    Icons.add_circle_outline,
+                    color: currentTheme.isDarkTheme()
+                    ? Colors.black
+                    : Colors.white,
+                  ),
+                  backgroundColor: currentTheme.isDarkTheme()
+                    ? Colors.blue[200]
+                    : Colors.blue[400],
                   mini: true,
                   elevation: 0,
                   highlightElevation: 0,
@@ -89,7 +183,6 @@ class _ContadorState extends State<Contador> {
           ],
         )
       ),
-
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
@@ -128,7 +221,9 @@ class _ContadorState extends State<Contador> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Colors.indigo,
+        color: currentTheme.isDarkTheme()
+          ? Colors.black12
+          : Colors.blue[100],
         child: Container(
           height: 80,
           child: Row(
@@ -137,24 +232,32 @@ class _ContadorState extends State<Contador> {
               IconButton(
                   icon: Icon(Icons.play_arrow),
                   onPressed: () {},
-                  color: Colors.white,
+                  color: currentTheme.isDarkTheme()
+                    ? Colors.white
+                    : Colors.black,
                   iconSize: 50),
               IconButton(
                   icon: Icon(Icons.pause),
                   onPressed: () {},
-                  color: Colors.white,
+                  color: currentTheme.isDarkTheme()
+                    ? Colors.white
+                    : Colors.black,
                   iconSize: 50),
               IconButton(
                   icon: Icon(Icons.stop),
                   onPressed: () {},
-                  color: Colors.white,
+                  color: currentTheme.isDarkTheme()
+                    ? Colors.white
+                    : Colors.black,
                   iconSize: 50),
               IconButton(
                   icon: Icon(Icons.replay_outlined),
                   onPressed: () {
                     setState(cero);
                   },
-                  color: Colors.white,
+                  color: currentTheme.isDarkTheme()
+                    ? Colors.white
+                    : Colors.black,
                   iconSize: 50)
             ],
           ),
