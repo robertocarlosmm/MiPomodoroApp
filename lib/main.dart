@@ -18,13 +18,14 @@ class _MyAppState extends State<MyApp> {
   ThemeProvider themeChangeProvider = new ThemeProvider();
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     getCurrentAppTheme();
   }
 
   void getCurrentAppTheme() async {
-    themeChangeProvider.setTheme = await themeChangeProvider.themePreference.getTheme();
+    themeChangeProvider.setTheme =
+        await themeChangeProvider.themePreference.getTheme();
   }
 
   @override
@@ -49,139 +50,203 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int minutos, segundos;
+  int min10, min, seg10, seg;
   @override
   void initState() {
-    minutos = 0;
-    segundos = 0;
+    min10 = 0;
+    min = 0;
+    seg10 = 0;
+    seg = 0;
     super.initState();
   }
 
-  colocaValor() {
-    segundos++;
-    if (segundos == 60) {
-      minutos++;
-      segundos = 0;
+  incSeg() {
+    seg++;
+    if (seg == 10) {
+      seg = 0;
+      seg10++;
+      if (seg10 == 6) {
+        seg10 = 0;
+        min++;
+        if (min == 10) {
+          min = 0;
+          min10++;
+          if (min10 == 10) {
+            min10 = 0;
+          }
+        }
+      }
     }
   }
 
-  aumentaMinuto() {
-    minutos++;
+  incSeg10() {
+    seg10++;
+    if (seg10 == 6) {
+      seg10 = 0;
+      min++;
+      if (min == 10) {
+        min = 0;
+        min10++;
+        if (min10 == 10) {
+          min10 = 0;
+        }
+      }
+    }
+  }
+
+  incMin() {
+    min++;
+    if (min == 10) {
+      min = 0;
+      min10++;
+      if (min10 == 10) {
+        min10 = 0;
+      }
+    }
+  }
+
+  incMin10() {
+    min10++;
+    if (min10 == 10) {
+      min10 = 0;
+    }
   }
 
   cero() {
-    segundos = 0;
-    minutos = 0;
+    seg10 = 0;
+    seg = 0;
+    min10 = 0;
+    min = 0;
   }
 
   @override
   Widget build(BuildContext context) {
     final currentTheme = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      backgroundColor: currentTheme.isDarkTheme()
-        ? Color(0xff2a293d)
-        : Colors.white,
+      backgroundColor:
+          currentTheme.isDarkTheme() ? Color(0xff2a293d) : Colors.white,
       appBar: AppBar(
         title: Text(
           widget.title,
           style: TextStyle(
-            color: currentTheme.isDarkTheme()
-            ? Colors.white
-            : Colors.black,
+            color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
           ),
         ),
-        backgroundColor: currentTheme.isDarkTheme()
-          ? Colors.black12
-          : Colors.blue[100],
+        backgroundColor:
+            currentTheme.isDarkTheme() ? Colors.black12 : Colors.blue[100],
         actions: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Icon(
-                Icons.wb_sunny,
-                color: currentTheme.isDarkTheme()
-                  ? Colors.white
-                  : Colors.black
-              ),
+              Icon(Icons.wb_sunny,
+                  color:
+                      currentTheme.isDarkTheme() ? Colors.white : Colors.black),
               Switch(
-                value: currentTheme.isDarkTheme(),
-                onChanged: (value) {
-                  String newTheme = value ? ThemePreference.DARK : ThemePreference.LIGHT;
-                  currentTheme.setTheme = newTheme;
-                }
-              ),
-              Icon(
-                Icons.brightness_2,
-                color: currentTheme.isDarkTheme()
-                  ? Colors.white
-                  : Colors.black
-              )
+                  value: currentTheme.isDarkTheme(),
+                  onChanged: (value) {
+                    String newTheme =
+                        value ? ThemePreference.DARK : ThemePreference.LIGHT;
+                    currentTheme.setTheme = newTheme;
+                  }),
+              Icon(Icons.brightness_2,
+                  color:
+                      currentTheme.isDarkTheme() ? Colors.white : Colors.black)
             ],
           )
         ],
       ),
       body: Center(
         child: Column(
-            children: [
+          children: [
             Text(
               "Actividad.nombre( )",
               style: TextStyle(
                 fontSize: 35.0,
-                color: currentTheme.isDarkTheme()
-                ? Colors.white
-                : Colors.black,
-              ),
-            ),
-            Text(
-              "$minutos : $segundos",
-              style: TextStyle(
-                fontSize: 60.0,
-                color: currentTheme.isDarkTheme()
-                ? Colors.white
-                : Colors.black,
+                color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
               ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                FloatingActionButton(
-                  child: Icon(
-                    Icons.add_circle_outline,
-                    color: currentTheme.isDarkTheme()
-                    ? Colors.black
-                    : Colors.white,
-                  ),
-                  backgroundColor: currentTheme.isDarkTheme()
-                    ? Colors.blue[200]
-                    : Colors.blue[400],
-                  mini: true,
-                  elevation: 0,
-                  highlightElevation: 0,
+                TextButton(
                   onPressed: () {
-                    setState(aumentaMinuto);
+                    setState(incMin10);
                   },
-                ),
-                FloatingActionButton(
-                  child: Icon(
-                    Icons.add_circle_outline,
-                    color: currentTheme.isDarkTheme()
-                    ? Colors.black
-                    : Colors.white,
+                  child: Text(
+                    '$min10',
+                    style: TextStyle(
+                      fontSize: 60.0,
+                      color: currentTheme.isDarkTheme()
+                          ? Colors.white
+                          : Colors.black,
+                    ),
                   ),
-                  backgroundColor: currentTheme.isDarkTheme()
-                    ? Colors.blue[200]
-                    : Colors.blue[400],
-                  mini: true,
-                  elevation: 0,
-                  highlightElevation: 0,
-                  onPressed: () {
-                    setState(colocaValor);
-                  },
                 ),
+                TextButton(
+                    onPressed: () {
+                      setState(incMin);
+                    },
+                    child: Text(
+                      '$min',
+                      style: TextStyle(
+                        fontSize: 60.0,
+                        color: currentTheme.isDarkTheme()
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    )),
+                TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      ' : ',
+                      style: TextStyle(
+                        fontSize: 60.0,
+                        color: currentTheme.isDarkTheme()
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    )),
+                TextButton(
+                    onPressed: () {
+                      setState(incSeg10);
+                    },
+                    child: Text(
+                      '$seg10',
+                      style: TextStyle(
+                        fontSize: 60.0,
+                        color: currentTheme.isDarkTheme()
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    )),
+                TextButton(
+                    onPressed: () {
+                      setState(incSeg);
+                    },
+                    child: Text(
+                      '$seg',
+                      style: TextStyle(
+                        fontSize: 60.0,
+                        color: currentTheme.isDarkTheme()
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    )),
               ],
             ),
           ],
         )
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.settings,
+          color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
+        ),
+        backgroundColor:
+            currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
+        elevation: 0,
+        highlightElevation: 0,
+        onPressed: () {},
       ),
       drawer: Drawer(
         child: ListView(
@@ -221,9 +286,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        color: currentTheme.isDarkTheme()
-          ? Colors.black12
-          : Colors.blue[100],
+        color: currentTheme.isDarkTheme() ? Colors.black12 : Colors.blue[100],
         child: Container(
           height: 80,
           child: Row(
@@ -232,32 +295,28 @@ class _HomePageState extends State<HomePage> {
               IconButton(
                   icon: Icon(Icons.play_arrow),
                   onPressed: () {},
-                  color: currentTheme.isDarkTheme()
-                    ? Colors.white
-                    : Colors.black,
+                  color:
+                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                   iconSize: 50),
               IconButton(
                   icon: Icon(Icons.pause),
                   onPressed: () {},
-                  color: currentTheme.isDarkTheme()
-                    ? Colors.white
-                    : Colors.black,
+                  color:
+                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                   iconSize: 50),
               IconButton(
                   icon: Icon(Icons.stop),
                   onPressed: () {},
-                  color: currentTheme.isDarkTheme()
-                    ? Colors.white
-                    : Colors.black,
+                  color:
+                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                   iconSize: 50),
               IconButton(
                   icon: Icon(Icons.replay_outlined),
                   onPressed: () {
                     setState(cero);
                   },
-                  color: currentTheme.isDarkTheme()
-                    ? Colors.white
-                    : Colors.black,
+                  color:
+                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                   iconSize: 50)
             ],
           ),
