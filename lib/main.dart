@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 import 'package:pomodoro_flutter/providers/theme.dart';
 import 'package:pomodoro_flutter/models/theme_preferences.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+
+
+enum PomodoroState {getReady,pomodoro,shortBreak,longBreak}
 
 void main() {
   runApp(MyApp());
@@ -50,14 +55,100 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int min10, min, seg10, seg;
+  int min10, min, seg10, seg, contador, maxpom,tiempopom;
+  bool indicador,descanso,fin;
+  double percent;
   @override
   void initState() {
     min10 = 0;
     min = 0;
     seg10 = 0;
     seg = 0;
+    contador = 0;
+    tiempopom = 0;
+    maxpom = 0;
+    indicador = false;
+    descanso=false;
+    fin=false;
+    percent=0;
     super.initState();
+  }
+
+  Timer timer;
+  _StartTimer(){
+    int Time=indicador?(descanso?5*60:tiempopom):0;
+    int cuentaTiempo=0;
+    double segPercent=(Time/100);
+    timer = Timer.periodic(Duration(seconds: 1), (timer){ 
+      print(Time);
+        if(Time>0){
+          Time--;
+          if(Time%segPercent==0){
+            if(percent<1){
+              percent+=0.1;
+            }
+            else{
+              percent=1;
+            }
+          }
+        }
+        else{
+            percent=0;
+            //Time=indicador?(descanso?5*60:tiempopom):0;
+            timer.cancel();
+            nextPomodoro();
+          }
+    });
+  }
+
+  enPlay(){
+    tiempopom=(min10*10+min)*60 + seg10*10+seg;
+    indicador=true;
+    _StartTimer();
+  }
+
+  enStop(){
+    indicador=false;
+    descanso=false;
+    cero();
+  }
+
+  devuelveValor(){
+    min10=(tiempopom~/60)~/10;
+    min=(tiempopom~/60)%10;
+    seg10=(tiempopom-(min10*10+min)*60)~/10;
+    seg=(tiempopom-(min10*10+min)*60)%10;
+  }
+
+  valorDescanso(){
+    min10=0;
+    min=5;
+    seg10=0;
+    seg=0;
+  }
+
+  nextPomodoro(){
+    if(!descanso){//estaba en modo pomodoro
+      contador++;
+      maxpom--;
+    }
+    descanso=!descanso;
+    descanso?valorDescanso():devuelveValor();
+    if(maxpom==0){
+        cero();
+        indicador=false;
+        descanso=false;
+      }
+    _StartTimer();
+  }
+
+  incPom(){
+    maxpom++;
+    if(maxpom==6)maxpom--;
+  }
+
+  decPom(){
+    (maxpom>0)?maxpom--:maxpom=0;
   }
 
   incSeg() {
@@ -122,12 +213,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final currentTheme = Provider.of<ThemeProvider>(context);
+    final size = 200.0;
+    final pi = 3.14159265;
     return Scaffold(
       backgroundColor:
           currentTheme.isDarkTheme() ? Color(0xff2a293d) : Colors.white,
       appBar: AppBar(
         title: Text(
-          widget.title,
+          "App Pomodoro v1.0",
           style: TextStyle(
             color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
           ),
@@ -157,97 +250,188 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              "Actividad.nombre( )",
-              style: TextStyle(
-                fontSize: 35.0,
-                color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+            Container(
+              padding: EdgeInsets.all(20.0),
+              margin: EdgeInsets.all(20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      setState(incMin10);
+                    },
+                    child: Text(
+                      '$min10',
+                      style: TextStyle(
+                        fontSize: 30.0,
+                        color: currentTheme.isDarkTheme()
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        setState(incMin);
+                      },
+                      child: Text(
+                        '$min',
+                        style: TextStyle(
+                          fontSize: 30.0,
+                          color: currentTheme.isDarkTheme()
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                      )),
+                  TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        ':',
+                        style: TextStyle(
+                          fontSize: 30.0,
+                          color: currentTheme.isDarkTheme()
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                      )),
+                  TextButton(
+                      onPressed: () {
+                        setState(incSeg10);
+                      },
+                      child: Text(
+                        '$seg10',
+                        style: TextStyle(
+                          fontSize: 30.0,
+                          color: currentTheme.isDarkTheme()
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                      )),
+                  TextButton(
+                      onPressed: () {
+                        setState(incSeg);
+                      },
+                      child: Text(
+                        '$seg',
+                        style: TextStyle(
+                          fontSize: 30.0,
+                          color: currentTheme.isDarkTheme()
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                      )),
+                ],
               ),
             ),
+            SizedBox(
+              height: 200.0,
+              width: 200.0,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  CircularPercentIndicator(
+                    percent: percent,
+                    animation: true,
+                    animateFromLastPercent: true,
+                    radius: 200.0,
+                    lineWidth: 10.0,
+                    progressColor: currentTheme.isDarkTheme()
+                              ? Colors.white
+                              : Colors.black,
+                    center: Text("$percent%",
+                            style: TextStyle(
+                            fontSize: 50.0,
+                            color: currentTheme.isDarkTheme()
+                                ? Colors.blueGrey
+                                : Colors.lightBlue,
+                          ),
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+                  height: 30.0,
+                ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextButton(
+                FloatingActionButton(
+                  backgroundColor: Colors.green,
+                  //isActive?Icons.pause:Icons.play_arrow
+                  child: Icon(indicador?Icons.skip_next:Icons.play_arrow),
                   onPressed: () {
-                    setState(incMin10);
-                  },
-                  child: Text(
-                    '$min10',
-                    style: TextStyle(
-                      fontSize: 60.0,
-                      color: currentTheme.isDarkTheme()
-                          ? Colors.white
-                          : Colors.black,
-                    ),
-                  ),
+                        indicador?setState(nextPomodoro):setState(enPlay);
+                      },
                 ),
-                TextButton(
-                    onPressed: () {
-                      setState(incMin);
-                    },
-                    child: Text(
-                      '$min',
-                      style: TextStyle(
-                        fontSize: 60.0,
-                        color: currentTheme.isDarkTheme()
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                    )),
-                TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      ' : ',
-                      style: TextStyle(
-                        fontSize: 60.0,
-                        color: currentTheme.isDarkTheme()
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                    )),
-                TextButton(
-                    onPressed: () {
-                      setState(incSeg10);
-                    },
-                    child: Text(
-                      '$seg10',
-                      style: TextStyle(
-                        fontSize: 60.0,
-                        color: currentTheme.isDarkTheme()
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                    )),
-                TextButton(
-                    onPressed: () {
-                      setState(incSeg);
-                    },
-                    child: Text(
-                      '$seg',
-                      style: TextStyle(
-                        fontSize: 60.0,
-                        color: currentTheme.isDarkTheme()
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                    )),
+                SizedBox(
+                  width: indicador?30.0:0,
+                ),
+
+                indicador?FloatingActionButton(
+                  backgroundColor: Colors.green,
+                  child: Icon(Icons.stop),
+                  onPressed: () {
+                        setState(enStop);
+                      },
+                ):Container()
               ],
             ),
+            SizedBox(
+                  height: 20.0,
+                ),
+            SizedBox(
+              height: 40.0,
+              child: indicador?Text(
+                descanso?"DESCANSANDO...":"TRABAJANDO!!!",
+                style: TextStyle(
+                  color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+                ),
+              ):Container()
+            ),
+            SizedBox(
+                  height: indicador?20.0:0,
+                ),
+            !indicador?Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FloatingActionButton(
+                  child: Icon(
+                    Icons.arrow_circle_up_rounded,
+                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
+                  ),
+                  backgroundColor:
+                      currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
+                  elevation: 0,
+                  highlightElevation: 0,
+                  onPressed: () {
+                        setState(incPom);
+                      },
+                ),
+                SizedBox(
+                  width: 30.0,
+                ),
+                FloatingActionButton(
+                  child: Icon(
+                    Icons.arrow_circle_down_rounded,
+                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
+                  ),
+                  backgroundColor:
+                      currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
+                  elevation: 0,
+                  highlightElevation: 0,
+                  onPressed: () {
+                        setState(decPom);
+                      },
+                ),
+              ],
+            ):Container(),
           ],
         )
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.settings,
-          color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
-        ),
-        backgroundColor:
-            currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
-        elevation: 0,
-        highlightElevation: 0,
-        onPressed: () {},
-      ),
+      
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
@@ -292,32 +476,42 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              IconButton(
-                  icon: Icon(Icons.play_arrow),
+              Text(
+                "Pomodoros: ",
+                style: TextStyle(
+                  color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+                ),
+              ),
+              maxpom>0?IconButton(
+                  icon: Icon(Icons.airline_seat_recline_normal_rounded),
                   onPressed: () {},
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50),
-              IconButton(
-                  icon: Icon(Icons.pause),
+                  iconSize: 50):Container(), 
+              maxpom>1?IconButton(
+                  icon: Icon(Icons.airline_seat_recline_normal_rounded),
                   onPressed: () {},
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50),
-              IconButton(
-                  icon: Icon(Icons.stop),
+                  iconSize: 50):Container(),
+              maxpom>2?IconButton(
+                  icon: Icon(Icons.airline_seat_recline_normal_rounded),
                   onPressed: () {},
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50),
-              IconButton(
-                  icon: Icon(Icons.replay_outlined),
-                  onPressed: () {
-                    setState(cero);
-                  },
+                  iconSize: 50):Container(),
+              maxpom>3?IconButton(
+                  icon: Icon(Icons.airline_seat_recline_normal_rounded),
+                  onPressed: () {},
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50)
+                  iconSize: 50):Container(),
+              maxpom>4?IconButton(
+                  icon: Icon(Icons.airline_seat_recline_normal_rounded),
+                  onPressed: () {},
+                  color:
+                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+                  iconSize: 50):Container(),
             ],
           ),
         ),
