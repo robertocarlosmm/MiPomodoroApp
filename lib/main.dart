@@ -60,8 +60,8 @@ class _HomePageState extends State<HomePage> {
   double percent;
   @override
   void initState() {
-    min10 = 0;
-    min = 0;
+    min10 = 2;
+    min = 5;
     seg10 = 0;
     seg = 0;
     contador = 0;
@@ -75,6 +75,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Timer timer;
+
   _StartTimer(){
     int Time=indicador?(descanso?5*60:tiempopom):0;
     int cuentaTiempo=0;
@@ -100,6 +101,9 @@ class _HomePageState extends State<HomePage> {
           }
     });
   }
+  _StopTimer(){
+    timer.cancel();
+  }
 
   enPlay(){
     tiempopom=(min10*10+min)*60 + seg10*10+seg;
@@ -110,6 +114,7 @@ class _HomePageState extends State<HomePage> {
   enStop(){
     indicador=false;
     descanso=false;
+    _StopTimer();
     cero();
   }
 
@@ -128,6 +133,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   nextPomodoro(){
+    _StopTimer();
     if(!descanso){//estaba en modo pomodoro
       contador++;
       maxpom--;
@@ -139,7 +145,9 @@ class _HomePageState extends State<HomePage> {
         indicador=false;
         descanso=false;
       }
-    _StartTimer();
+    else{
+      _StartTimer();
+    }
   }
 
   incPom(){
@@ -285,17 +293,14 @@ class _HomePageState extends State<HomePage> {
                               : Colors.black,
                         ),
                       )),
-                  TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        ':',
-                        style: TextStyle(
-                          fontSize: 30.0,
-                          color: currentTheme.isDarkTheme()
-                              ? Colors.white
-                              : Colors.black,
+                  Text(
+                      ':',style: TextStyle(
+                        fontSize: 30.0,
+                        color: currentTheme.isDarkTheme()
+                          ? Colors.white
+                          : Colors.black,
                         ),
-                      )),
+                      ),
                   TextButton(
                       onPressed: () {
                         setState(incSeg10);
