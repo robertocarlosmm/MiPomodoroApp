@@ -55,13 +55,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int min10, min, seg10, seg, contador, maxpom,tiempopom;
+  int min10, min, seg10, seg, contador, maxpom,tiempopom,valor;
   bool indicador,descanso,fin;
   double percent;
   @override
   void initState() {
-    min10 = 2;
-    min = 5;
+    min10 = 0;
+    min = 0;
     seg10 = 0;
     seg = 0;
     contador = 0;
@@ -71,50 +71,63 @@ class _HomePageState extends State<HomePage> {
     descanso=false;
     fin=false;
     percent=0;
+    valor=0;
     super.initState();
   }
 
   Timer timer;
 
-  _StartTimer(){
+  StartTimer(){
     int Time=indicador?(descanso?5*60:tiempopom):0;
-    int cuentaTiempo=0;
-    double segPercent=(Time/100);
+    double segPercent;
+    if(Time>0)segPercent=(100/Time);
+    print("porcentaje: $segPercent");
     timer = Timer.periodic(Duration(seconds: 1), (timer){ 
       print(Time);
         if(Time>0){
           Time--;
-          if(Time%segPercent==0){
-            if(percent<1){
-              percent+=0.1;
-            }
-            else{
+          
+          print("percent: $percent");
+          if(percent<1){
+            if(percent +(segPercent/100) >1){
               percent=1;
             }
+            else{
+              percent+=(segPercent/100);
+            }
+            valor=(percent*100).toInt();
           }
+          else{
+            percent=1;
+            valor=100;
+          }
+          
         }
         else{
-            percent=0;
+            //percent=0;
+            //valor=0;
             //Time=indicador?(descanso?5*60:tiempopom):0;
-            timer.cancel();
-            nextPomodoro();
+            //timer.cancel();
+            setState(nextPomodoro());
           }
     });
   }
-  _StopTimer(){
+  StopTimer(){
     timer.cancel();
   }
 
   enPlay(){
     tiempopom=(min10*10+min)*60 + seg10*10+seg;
     indicador=true;
-    _StartTimer();
+    StartTimer();
   }
 
   enStop(){
     indicador=false;
     descanso=false;
-    _StopTimer();
+    percent=0;
+    valor=0;
+    StopTimer();
     cero();
   }
 
@@ -133,7 +146,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   nextPomodoro(){
-    _StopTimer();
+    percent=0;
+    valor=0;
+    StopTimer();
     if(!descanso){//estaba en modo pomodoro
       contador++;
       maxpom--;
@@ -146,13 +161,12 @@ class _HomePageState extends State<HomePage> {
         descanso=false;
       }
     else{
-      _StartTimer();
+      StartTimer();
     }
   }
 
   incPom(){
-    maxpom++;
-    if(maxpom==6)maxpom--;
+    if(maxpom<5) maxpom++;
   }
 
   decPom(){
@@ -268,7 +282,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   TextButton(
                     onPressed: () {
-                      setState(incMin10);
+                      if(!indicador)setState(incMin10);
                     },
                     child: Text(
                       '$min10',
@@ -282,7 +296,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   TextButton(
                       onPressed: () {
-                        setState(incMin);
+                        if(!indicador)setState(incMin);
                       },
                       child: Text(
                         '$min',
@@ -293,8 +307,7 @@ class _HomePageState extends State<HomePage> {
                               : Colors.black,
                         ),
                       )),
-                  Text(
-                      ':',style: TextStyle(
+                  Text(':',style: TextStyle(
                         fontSize: 30.0,
                         color: currentTheme.isDarkTheme()
                           ? Colors.white
@@ -303,7 +316,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                   TextButton(
                       onPressed: () {
-                        setState(incSeg10);
+                        if(!indicador)setState(incSeg10);
                       },
                       child: Text(
                         '$seg10',
@@ -316,7 +329,7 @@ class _HomePageState extends State<HomePage> {
                       )),
                   TextButton(
                       onPressed: () {
-                        setState(incSeg);
+                        if(!indicador)setState(incSeg);
                       },
                       child: Text(
                         '$seg',
@@ -343,9 +356,9 @@ class _HomePageState extends State<HomePage> {
                     radius: 200.0,
                     lineWidth: 10.0,
                     progressColor: currentTheme.isDarkTheme()
-                              ? Colors.white
-                              : Colors.black,
-                    center: Text("$percent%",
+                              ? Colors.blueGrey
+                              : Colors.lightBlue,
+                    center: Text("$valor%",
                             style: TextStyle(
                             fontSize: 50.0,
                             color: currentTheme.isDarkTheme()
