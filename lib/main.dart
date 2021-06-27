@@ -55,78 +55,72 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int min10, min, seg10, seg, contador, maxpom,tiempopom,valor;
-  bool indicador,descanso,fin;
-  double percent;
+  int min10=0, min=0, seg10=0, seg=0, contador=0, maxpom=0,tiempopom=0,_start=0;
+  bool indicador=false,descanso=false,fin=false;
+  double percent=0;
   @override
   void initState() {
-    min10 = 0;
-    min = 0;
-    seg10 = 0;
-    seg = 0;
-    contador = 0;
-    tiempopom = 0;
-    maxpom = 0;
-    indicador = false;
-    descanso=false;
-    fin=false;
-    percent=0;
-    valor=0;
     super.initState();
   }
 
-  Timer timer;
+  Timer _timer;
+  
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(oneSec, (timer) {
+      setState(() {
+        if (_start < 1) {
+          setState(() {
+                      nextPomodoro();
+                    });
+        } else {  
+          _start = _start - 1;
+          print(_start);
+          setState(() {
+            decTiempo();             
+          });
 
-  StartTimer(){
-    int Time=indicador?(descanso?5*60:tiempopom):0;
-    double segPercent;
-    if(Time>0)segPercent=(100/Time);
-    print("porcentaje: $segPercent");
-    timer = Timer.periodic(Duration(seconds: 1), (timer){ 
-      print(Time);
-        if(Time>0){
-          Time--;
-          
-          print("percent: $percent");
-          if(percent<1){
-            if(percent +(segPercent/100) >1){
-              percent=1;
-            }
-            else{
-              percent+=(segPercent/100);
-            }
-            valor=(percent*100).toInt();
-          }
-          else{
-            percent=1;
-            valor=100;
-          }
-          
         }
-        else{
-            //percent=0;
-            //valor=0;
-            //Time=indicador?(descanso?5*60:tiempopom):0;
-            //timer.cancel();
-            setState(nextPomodoro());
-          }
+      });
     });
   }
+
+
   StopTimer(){
-    timer.cancel();
+    _timer?.cancel();
   }
 
   enPlay(){
     tiempopom=(min10*10+min)*60 + seg10*10+seg;
     indicador=true;
-    StartTimer();
+    _start=tiempopom;
+    startTimer();
+  }
+
+    nextPomodoro(){
+    percent=0;
+    StopTimer();
+    if(!descanso){//estaba en modo pomodoro
+      contador++;
+      maxpom--;
+    }
+    descanso=!descanso;
+    descanso?valorDescanso():devuelveValor();
+    if(maxpom==0){
+        cero();
+        indicador=false;
+        descanso=false;
+      }
+    else{
+      _start=indicador?(descanso?5*60:tiempopom):0;
+      startTimer();
+    }
   }
 
   enStop(){
     indicador=false;
     descanso=false;
     percent=0;
-    valor=0;
     StopTimer();
     cero();
   }
@@ -145,28 +139,35 @@ class _HomePageState extends State<HomePage> {
     seg=0;
   }
 
-  nextPomodoro(){
-    percent=0;
-    valor=0;
-    StopTimer();
-    if(!descanso){//estaba en modo pomodoro
-      contador++;
-      maxpom--;
-    }
-    descanso=!descanso;
-    descanso?valorDescanso():devuelveValor();
-    if(maxpom==0){
-        cero();
-        indicador=false;
-        descanso=false;
-      }
-    else{
-      StartTimer();
-    }
-  }
-
   incPom(){
     if(maxpom<5) maxpom++;
+  }
+
+  decTiempo(){
+    if(seg>0){//Mm:Ss
+      seg--;
+    }
+    else{//Mm:S0
+      if(seg10>0){
+        seg10--;
+        seg=9;
+      }
+      else{//mm:00
+        if(min>0){
+          min--;
+          seg10=5;
+          seg=9;
+        }
+        else{//m0:00
+          if(min10>0){
+            min10--;
+            min=9;
+            seg10=5;
+            seg=9;
+          }
+        }
+      }
+    }
   }
 
   decPom(){
@@ -343,33 +344,61 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             SizedBox(
-              height: 200.0,
-              width: 200.0,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  CircularPercentIndicator(
-                    percent: percent,
-                    animation: true,
-                    animateFromLastPercent: true,
-                    radius: 200.0,
-                    lineWidth: 10.0,
-                    progressColor: currentTheme.isDarkTheme()
-                              ? Colors.blueGrey
-                              : Colors.lightBlue,
-                    center: Text("$valor%",
-                            style: TextStyle(
-                            fontSize: 50.0,
-                            color: currentTheme.isDarkTheme()
-                                ? Colors.blueGrey
-                                : Colors.lightBlue,
-                          ),
-                        ),
-                  ),
-                ],
-              ),
+            //ACA IRA LA RUEDITA
             ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             SizedBox(
                   height: 30.0,
                 ),
@@ -537,3 +566,5 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
