@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:pomodoro_flutter/providers/theme.dart';
 import 'package:pomodoro_flutter/models/theme_preferences.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:liquid_progress_indicator_ns/liquid_progress_indicator.dart';
 
 
 enum PomodoroState {getReady,pomodoro,shortBreak,longBreak}
@@ -57,7 +58,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int min10=0, min=0, seg10=0, seg=0, contador=0, maxpom=0,tiempopom=0,_start=0;
   bool indicador=false,descanso=false,fin=false;
-  double percent=0;
+  double percent=0,segPercent=0;
+  int valorPorcentaje=0;
   @override
   void initState() {
     super.initState();
@@ -67,6 +69,8 @@ class _HomePageState extends State<HomePage> {
   
   void startTimer() {
     const oneSec = const Duration(seconds: 1);
+    if(_start>0)segPercent=(100/_start);//el porcentaje del tiempo en 1 segundo
+    print(segPercent);
     _timer = new Timer.periodic(oneSec, (timer) {
       setState(() {
         if (_start < 1) {
@@ -79,7 +83,21 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             decTiempo();             
           });
-
+          print("percent: $percent");
+          print("valor:   $valorPorcentaje");
+          if(percent<1){
+            if(percent +(segPercent/100) >1){
+              percent=1;
+            }
+            else{
+              percent+=(segPercent/100);
+            }
+            valorPorcentaje=(percent*100).toInt();
+          }
+          else{
+            percent=1;
+            valorPorcentaje=100;
+          }
         }
       });
     });
@@ -97,8 +115,9 @@ class _HomePageState extends State<HomePage> {
     startTimer();
   }
 
-    nextPomodoro(){
+  nextPomodoro(){
     percent=0;
+    valorPorcentaje=0;
     StopTimer();
     if(!descanso){//estaba en modo pomodoro
       contador++;
@@ -121,6 +140,7 @@ class _HomePageState extends State<HomePage> {
     indicador=false;
     descanso=false;
     percent=0;
+    valorPorcentaje=0;
     StopTimer();
     cero();
   }
@@ -345,59 +365,30 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             SizedBox(
-            //ACA IRA LA RUEDITA
+              height: 200.0,
+              width:  200.0,
+              child: LiquidCircularProgressIndicator(
+                value: percent, // Defaults to 0.5.
+                backgroundColor: currentTheme.isDarkTheme() ? Colors.black12 : Colors.grey[100],
+                valueColor: AlwaysStoppedAnimation(
+                  currentTheme.isDarkTheme() ? Colors.cyan[900] : Colors.lightBlueAccent[300]
+                  ), // Defaults to the current Theme's accentColor.
+                borderColor: Colors.transparent,
+                borderWidth: 5.0,
+                direction: Axis.vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.vertical.
+                center: Text("$valorPorcentaje%",
+                            style: TextStyle(
+                              fontSize: 30.0,
+                              color: currentTheme.isDarkTheme()
+                                  ? Colors.white
+                                  : Colors.black,
+                        ),),
+              ),
             ),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            //ACA IRA LA RUEDITA
+            
+            
 
             SizedBox(
                   height: 30.0,
@@ -406,9 +397,11 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FloatingActionButton(
-                  backgroundColor: Colors.green,
+                  backgroundColor: currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
                   //isActive?Icons.pause:Icons.play_arrow
-                  child: Icon(indicador?Icons.skip_next:Icons.play_arrow),
+                  child: Icon(
+                    indicador?Icons.skip_next:Icons.play_arrow,
+                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
                   onPressed: () {
                         indicador?setState(nextPomodoro):setState(enPlay);
                       },
@@ -418,8 +411,11 @@ class _HomePageState extends State<HomePage> {
                 ),
 
                 indicador?FloatingActionButton(
-                  backgroundColor: Colors.green,
-                  child: Icon(Icons.stop),
+                  backgroundColor: currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
+                  child: Icon(
+                    Icons.stop,
+                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
+                  ),
                   onPressed: () {
                         setState(enStop);
                       },

@@ -27,6 +27,7 @@ dependencies:
   provider: ^5.0.0
   shared_preferences: ^2.0.6
   percent_indicator: "^2.1.7+2"
+  liquid_progress_indicator_ns: ^1.0.0
 
 dev_dependencies:
   flutter_test:
