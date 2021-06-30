@@ -475,6 +475,7 @@ class _HomePageState extends State<HomePage> {
         )
       ),
       
+      //DRAWER QUE NO HACE NADA
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
@@ -512,6 +513,9 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+
+
+      //CANTIDAD DE POMODOROS
       bottomNavigationBar: BottomAppBar(
         color: currentTheme.isDarkTheme() ? Colors.black12 : Colors.blue[100],
         child: Container(
@@ -519,12 +523,12 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(
+              /*Text(
                 "Pomodoros: ",
                 style: TextStyle(
                   color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                 ),
-              ),
+              ),*/
               maxpom>0?IconButton(
                   icon: Icon(Icons.airline_seat_recline_normal_rounded),
                   onPressed: () {},
