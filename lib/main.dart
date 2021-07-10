@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 import 'package:pomodoro_flutter/providers/theme.dart';
 import 'package:pomodoro_flutter/models/theme_preferences.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:liquid_progress_indicator_ns/liquid_progress_indicator.dart';
-
-
-enum PomodoroState {getReady,pomodoro,shortBreak,longBreak}
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(MyApp());
@@ -59,14 +57,16 @@ class _HomePageState extends State<HomePage> {
   int min10=0, min=0, seg10=0, seg=0, contador=0, maxpom=0,tiempopom=0,_start=0;
   bool indicador=false,descanso=false,fin=false;
   double percent=0,segPercent=0;
-  int valorPorcentaje=0;
+  int valorPorcentaje=0,tiempodescanso=0,temporal=0;
+  int d_min10=0, d_min=5, d_seg10=0, d_seg=0;
+  bool p_select=false,d_select=false;
   @override
   void initState() {
     super.initState();
   }
 
   Timer _timer;
-  
+  final player = AudioCache();
   void startTimer() {
     const oneSec = const Duration(seconds: 1);
     if(_start>0)segPercent=(100/_start);//el porcentaje del tiempo en 1 segundo
@@ -74,6 +74,7 @@ class _HomePageState extends State<HomePage> {
     _timer = new Timer.periodic(oneSec, (timer) {
       setState(() {
         if (_start < 1) {
+          
           setState(() {
                       nextPomodoro();
                     });
@@ -103,6 +104,11 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  playSoundBubble(){
+    
+    player.play('bubbles_not.mp3');
+    print("REPRODUCIDO");
+  }
 
   StopTimer(){
     _timer?.cancel();
@@ -110,12 +116,16 @@ class _HomePageState extends State<HomePage> {
 
   enPlay(){
     tiempopom=(min10*10+min)*60 + seg10*10+seg;
+    tiempodescanso=(d_min10*10+d_min)*60 + d_seg10*10+d_seg;
     indicador=true;
     _start=tiempopom;
     startTimer();
   }
 
   nextPomodoro(){
+    setState(() {
+                      playSoundBubble();
+                    });
     percent=0;
     valorPorcentaje=0;
     StopTimer();
@@ -131,7 +141,7 @@ class _HomePageState extends State<HomePage> {
         descanso=false;
       }
     else{
-      _start=indicador?(descanso?5*60:tiempopom):0;
+      _start=indicador?(descanso?tiempodescanso:tiempopom):0;
       startTimer();
     }
   }
@@ -153,10 +163,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   valorDescanso(){
-    min10=0;
-    min=5;
-    seg10=0;
-    seg=0;
+    min10=(tiempodescanso~/60)~/10;
+    min=(tiempodescanso~/60)%10;
+    seg10=(tiempodescanso-(min10*10+min)*60)~/10;
+    seg=(tiempodescanso-(min10*10+min)*60)%10;
   }
 
   incPom(){
@@ -253,17 +263,116 @@ class _HomePageState extends State<HomePage> {
     min = 0;
   }
 
+  setPom(int num){
+    min10=num~/10;
+    min=num%10;
+    seg10=0;
+    seg=0;
+  }
+
+  setDes(int num){
+    d_min10=num~/10;
+    d_min=num%10;
+    d_seg10=0;
+    d_seg=0;
+  }
+
+  configuraDescanso(BuildContext context){
+    showDialog(context: context,builder: (context)=>AlertDialog(
+      title: Text("Tiempo de descanso"),
+      content: SizedBox(
+        width:  200.0,
+        height: 200.0,
+        child: Center(
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Minutos',
+              labelText: 'Tiempo de descanso',
+              prefixIcon: Icon(Icons.charging_station_rounded),
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            maxLength: 2,
+            onChanged: (valor){
+              temporal = int.parse(valor);
+            },
+          ),
+        )
+      ),
+      actions: [
+        TextButton(
+          child: Text("Cancelar"),
+          onPressed: (){
+            Navigator.pop(context);
+          },
+        ),
+        TextButton(
+          child: Text("Aceptar"),
+          onPressed: (){
+            setState(() {
+              setDes(temporal);
+                        });
+            Navigator.pop(context);
+          },
+        )
+      ],
+    ));
+  }
+
+  configura(BuildContext context){
+    showDialog(context: context,builder: (context)=>AlertDialog(
+      title: Text("Tiempo de estudio"),
+      content: SizedBox(
+        width:  200.0,
+        height: 200.0,
+        child: Center(
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Minutos',
+              labelText: 'Tiempo de Estudio',
+              prefixIcon: Icon(Icons.airline_seat_recline_normal_rounded),
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            maxLength: 2,
+            onChanged: (valor){
+              temporal = int.parse(valor);
+            },
+          ),
+        )
+      ),
+      actions: [
+        TextButton(
+          child: Text("Cancelar"),
+          onPressed: (){
+            Navigator.pop(context);
+          },
+        ),
+        TextButton(
+          child: Text("Aceptar"),
+          onPressed: (){
+            setState(() {
+              setPom(temporal);
+                        });
+            Navigator.pop(context);
+          },
+        )
+      ],
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentTheme = Provider.of<ThemeProvider>(context);
-    final size = 200.0;
-    final pi = 3.14159265;
     return Scaffold(
       backgroundColor:
           currentTheme.isDarkTheme() ? Color(0xff2a293d) : Colors.white,
+          
       appBar: AppBar(
         title: Text(
-          "App Pomodoro v1.0",
+          indicador?(descanso?"   DESCANSANDO":"   TIEMPO DE ESTUDIO"):"   ¿LISTO?",
           style: TextStyle(
             color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
           ),
@@ -286,11 +395,12 @@ class _HomePageState extends State<HomePage> {
                   }),
               Icon(Icons.brightness_2,
                   color:
-                      currentTheme.isDarkTheme() ? Colors.white : Colors.black)
+                      currentTheme.isDarkTheme() ? Colors.white : Colors.black),
             ],
           )
         ],
       ),
+      
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -372,7 +482,11 @@ class _HomePageState extends State<HomePage> {
                 value: percent, // Defaults to 0.5.
                 backgroundColor: currentTheme.isDarkTheme() ? Colors.black12 : Colors.grey[100],
                 valueColor: AlwaysStoppedAnimation(
-                  currentTheme.isDarkTheme() ? Colors.cyan[900] : Colors.lightBlueAccent[300]
+                  currentTheme.isDarkTheme() ? 
+                  (descanso?Colors.pinkAccent[700]
+                  :Colors.cyan[900]) 
+                  : (descanso?Colors.pink[200]
+                  :Colors.lightBlueAccent[300])
                   ), // Defaults to the current Theme's accentColor.
                 borderColor: Colors.transparent,
                 borderWidth: 5.0,
@@ -396,35 +510,53 @@ class _HomePageState extends State<HomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                !indicador?FloatingActionButton(
+                  backgroundColor: currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
+                  //isActive?Icons.pause:Icons.play_arrow
+                  child: Icon(Icons.hourglass_top_rounded,
+                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
+                    onPressed: () {
+                        configura(context);
+                      },
+                ):Container(),
+
+                SizedBox(
+                  width: !indicador?30.0:0,
+                ),
+
                 FloatingActionButton(
                   backgroundColor: currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
                   //isActive?Icons.pause:Icons.play_arrow
                   child: Icon(
                     indicador?Icons.skip_next:Icons.play_arrow,
                     color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
-                  onPressed: () {
+                    onPressed: () {
                         indicador?setState(nextPomodoro):setState(enPlay);
                       },
                 ),
                 SizedBox(
-                  width: indicador?30.0:0,
+                  width: 30.0,
                 ),
 
-                indicador?FloatingActionButton(
+                FloatingActionButton(
                   backgroundColor: currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
                   child: Icon(
-                    Icons.stop,
+                    !indicador?Icons.charging_station_rounded:Icons.stop,
                     color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
                   ),
                   onPressed: () {
-                        setState(enStop);
+                        indicador?setState(enStop):configuraDescanso(context);
                       },
-                ):Container()
+                )
               ],
             ),
+
             SizedBox(
-                  height: 20.0,
+                  height: 6.0,
                 ),
+            
+            indicador?SizedBox(height: 60.0):Container(),
+
             SizedBox(
               height: 40.0,
               child: indicador?Text(
@@ -434,6 +566,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ):Container()
             ),
+
             SizedBox(
                   height: indicador?20.0:0,
                 ),
@@ -474,46 +607,6 @@ class _HomePageState extends State<HomePage> {
           ],
         )
       ),
-      
-      //DRAWER QUE NO HACE NADA
-      drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text("Usuario PUCP"),
-              accountEmail: Text("user.name@pucp.edu.pe"),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.tealAccent,
-                child: Text(
-                  'C',
-                  style: TextStyle(fontSize: 35.5),
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text('Actividades de Hoy'),
-              onTap: () {},
-            ),
-            ListTile(
-              title: Text('Actividades Semanales'),
-              onTap: () {},
-            ),
-            ListTile(
-              title: Text('Resumen Semanal'),
-              onTap: () {},
-            ),
-            ListTile(
-              title: Text('Resumen Mensual'),
-              onTap: () {},
-            ),
-            ListTile(
-              title: Text('Calendario'),
-              onTap: () {},
-            ),
-          ],
-        ),
-      ),
-
 
       //CANTIDAD DE POMODOROS
       bottomNavigationBar: BottomAppBar(
