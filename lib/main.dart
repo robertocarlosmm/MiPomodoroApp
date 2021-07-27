@@ -463,7 +463,7 @@ class _HomePageState extends State<HomePage> {
           
       appBar: AppBar(
         title: Text(
-          indicador?(descanso?"   DESCANSANDO":"   TIEMPO DE ESTUDIO"):"   ¿LISTO?",
+          indicador?(descanso?"   DESCANSANDO":"   CONCENTRADO"):"   ¿LISTO?",
           style: TextStyle(
             color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
           ),
@@ -1019,6 +1019,18 @@ class _HomePageState extends State<HomePage> {
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                   iconSize: 50):Container(),
+              /*maxpom>5?IconButton(
+                  icon: Icon(Icons.bolt),
+                  onPressed: () {},
+                  color:
+                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+                  iconSize: 50):Container(),
+              maxpom>6?IconButton(
+                  icon: Icon(Icons.bolt),
+                  onPressed: () {},
+                  color:
+                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+                  iconSize: 50):Container(),*/
             ],
           ),
         ),
