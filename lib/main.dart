@@ -54,12 +54,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int min10=0, min=0, seg10=0, seg=0, contador=0, maxpom=0,tiempopom=0,_start=0;
+  int min10=2, min=0, seg10=0, seg=0, contador=0, maxpom=0,tiempopom=0,_start=0;
   bool indicador=false,descanso=false,fin=false;
   double percent=0,segPercent=0;
   int valorPorcentaje=0,tiempodescanso=0,temporal=0;
   int d_min10=0, d_min=5, d_seg10=0, d_seg=0;
   bool p_select=false,d_select=false;
+  bool editar=false,editar2=false;
   @override
   void initState() {
     super.initState();
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
   void startTimer() {
     const oneSec = const Duration(seconds: 1);
     if(_start>0)segPercent=(100/_start);//el porcentaje del tiempo en 1 segundo
-    print(segPercent);
+    //print(segPercent);
     _timer = new Timer.periodic(oneSec, (timer) {
       setState(() {
         if (_start < 1) {
@@ -80,12 +81,12 @@ class _HomePageState extends State<HomePage> {
                     });
         } else {  
           _start = _start - 1;
-          print(_start);
+          //print(_start);
           setState(() {
             decTiempo();             
           });
-          print("percent: $percent");
-          print("valor:   $valorPorcentaje");
+          //print("percent: $percent");
+          //print("valor:   $valorPorcentaje");
           if(percent<1){
             if(percent +(segPercent/100) >1){
               percent=1;
@@ -105,9 +106,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   playSoundBubble(){
-    
     player.play('bubbles_not.mp3');
-    print("REPRODUCIDO");
+    player.play('bubbles_not.mp3');
+    //print("REPRODUCIDO");
   }
 
   StopTimer(){
@@ -117,9 +118,11 @@ class _HomePageState extends State<HomePage> {
   enPlay(){
     tiempopom=(min10*10+min)*60 + seg10*10+seg;
     tiempodescanso=(d_min10*10+d_min)*60 + d_seg10*10+d_seg;
-    indicador=true;
-    _start=tiempopom;
-    startTimer();
+    if(maxpom>0 && tiempodescanso>0 && tiempopom>0){
+      indicador=true;
+      _start=tiempopom;
+      startTimer();
+    }    
   }
 
   nextPomodoro(){
@@ -136,7 +139,7 @@ class _HomePageState extends State<HomePage> {
     descanso=!descanso;
     descanso?valorDescanso():devuelveValor();
     if(maxpom==0){
-        cero();
+        devuelveValor();
         indicador=false;
         descanso=false;
       }
@@ -152,7 +155,7 @@ class _HomePageState extends State<HomePage> {
     percent=0;
     valorPorcentaje=0;
     StopTimer();
-    cero();
+    devuelveValor();
   }
 
   devuelveValor(){
@@ -276,13 +279,100 @@ class _HomePageState extends State<HomePage> {
     d_seg10=0;
     d_seg=0;
   }
+  double currentSlider=0;
+  double temporal_pom=0;
+  prototipo(){
+    indicador
+    ?Container()
+    :Container(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Slider(
+                value: (min10*10+min).toDouble(),
+                min: 10,
+                max: 90,
+                onChanged: (newValue){
+                  setState(() {
+                    tiempopom=newValue.toInt();
+                    setPom(tiempopom);
+                                    });
+                },
+              )
+            ],
+          ),
+          Row(),
+        ],
+      ),
+    );
+  }
+
+
+  muestraSlider(BuildContext context){
+    showDialog(context: context,builder: (context)=>AlertDialog(
+      title: Text("Tiempo de Concentración"),
+      content: SizedBox(
+        width:  100.0,
+        height: 100.0,
+        child: Center(
+          child: Column(
+            children: [
+              Slider(
+                value: temporal_pom,
+                min: 0.0,
+                max: 90.0,
+                onChanged:(newValue){
+                  setState(() {
+                    temporal_pom = newValue;           
+                    print('$newValue');  
+                    Navigator.pop(context);
+                    muestraSlider(context);
+                  });
+                }, 
+              ),
+              SizedBox(
+                height: 20,
+                child: Text(
+                  '$temporal_pom',
+                  style: TextStyle(fontSize: 15),
+                ),
+              ),
+            ],
+          ),
+          
+          
+        )
+      ),
+      actions: [
+        TextButton(
+          child: Text("Cancelar"),
+          onPressed: (){
+            setState(() {
+                temporal_pom=(min10*10+min).toDouble();
+                        });
+            Navigator.pop(context);
+          },
+        ),
+        TextButton(
+          child: Text("Aceptar"),
+          onPressed: (){
+            setState(() {
+              setPom(temporal_pom.toInt());
+                        });
+            Navigator.pop(context);
+          },
+        )
+      ],
+    ));
+  }
 
   configuraDescanso(BuildContext context){
     showDialog(context: context,builder: (context)=>AlertDialog(
       title: Text("Tiempo de descanso"),
       content: SizedBox(
-        width:  200.0,
-        height: 200.0,
+        width:  100.0,
+        height: 100.0,
         child: Center(
           child: TextField(
             decoration: InputDecoration(
@@ -324,8 +414,8 @@ class _HomePageState extends State<HomePage> {
     showDialog(context: context,builder: (context)=>AlertDialog(
       title: Text("Tiempo de estudio"),
       content: SizedBox(
-        width:  200.0,
-        height: 200.0,
+        width:  100.0,
+        height: 100.0,
         child: Center(
           child: TextField(
             decoration: InputDecoration(
@@ -367,6 +457,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final currentTheme = Provider.of<ThemeProvider>(context);
     return Scaffold(
+      resizeToAvoidBottomInset:false,
       backgroundColor:
           currentTheme.isDarkTheme() ? Color(0xff2a293d) : Colors.white,
           
@@ -377,8 +468,16 @@ class _HomePageState extends State<HomePage> {
             color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
           ),
         ),
-        backgroundColor:
-            currentTheme.isDarkTheme() ? Colors.black12 : Colors.blue[100],
+        backgroundColor:currentTheme.isDarkTheme()
+                  ?(indicador
+                    ?(descanso?Colors.pink[600]
+                      :Colors.cyan[800])
+                    :Colors.black12)
+                  :(indicador
+                    ?(descanso?Colors.pink[300]
+                      :Colors.lightBlueAccent[400])
+                    :Colors.blue[100]),
+            //currentTheme.isDarkTheme() ? Colors.black12 : Colors.blue[100],
         actions: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -387,6 +486,11 @@ class _HomePageState extends State<HomePage> {
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black),
               Switch(
+                  activeColor: 
+                    indicador
+                      ?(descanso?Colors.pink[300]
+                      :Colors.cyan[400])
+                    :Colors.blue[400],
                   value: currentTheme.isDarkTheme(),
                   onChanged: (value) {
                     String newTheme =
@@ -483,17 +587,17 @@ class _HomePageState extends State<HomePage> {
                 backgroundColor: currentTheme.isDarkTheme() ? Colors.black12 : Colors.grey[100],
                 valueColor: AlwaysStoppedAnimation(
                   currentTheme.isDarkTheme() ? 
-                  (descanso?Colors.pinkAccent[700]
-                  :Colors.cyan[900]) 
-                  : (descanso?Colors.pink[200]
-                  :Colors.lightBlueAccent[300])
+                  (descanso?Colors.pink[600]
+                  :Colors.cyan[800]) 
+                  : (descanso?Colors.pink[300]
+                  :Colors.lightBlueAccent[400])
                   ), // Defaults to the current Theme's accentColor.
                 borderColor: Colors.transparent,
                 borderWidth: 5.0,
                 direction: Axis.vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.vertical.
                 center: Text("$valorPorcentaje%",
                             style: TextStyle(
-                              fontSize: 30.0,
+                              fontSize: 35.0,
                               color: currentTheme.isDarkTheme()
                                   ? Colors.white
                                   : Colors.black,
@@ -502,30 +606,251 @@ class _HomePageState extends State<HomePage> {
             ),
             //ACA IRA LA RUEDITA
             
-            
+            indicador
+    ?Container()
+    :Container(
+      child: Column(
+        children: [
+          SizedBox(height: 30,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 50,
+                child: Icon(Icons.lock_clock,color: currentTheme.isDarkTheme()?Colors.white:Colors.black)
+              ),
+              SizedBox(
+                height: 50,
+                width: 200,
+                child:Slider(
+                  value: (min10*10+min).toDouble(),
+                  min: 0,
+                  max: 90,
+                  activeColor: currentTheme.isDarkTheme()
+                  ?(indicador
+                    ?(descanso?Colors.pink[600]
+                      :Colors.cyan[800])
+                    :Colors.blue[400])
+                  :(indicador
+                    ?(descanso?Colors.pink[300]
+                      :Colors.lightBlueAccent[400])
+                    :Colors.blue[100]),
+                  onChanged: (newValue){
+                    setState(() {
+                      tiempopom=newValue.toInt();
+                      setPom(tiempopom);
+                                      });
+                  },
+                ),
+              ),
+              
+              SizedBox(
+                width: 50,
+                height: 50,
+                child:editar
+                ?TextField(
+                decoration: InputDecoration(
+                  //hintText: 'Minutos',
+                  //labelText: 'Minutos',
+                  //prefixIcon: Icon(Icons.charging_station_rounded),
+                  border: OutlineInputBorder(),
+                ),
+                keyboardAppearance: currentTheme.isDarkTheme()?Brightness.dark:Brightness.light,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: currentTheme.isDarkTheme()?Colors.white:Colors.black),
+                //maxLength: 2,
+                
+                onChanged: (valor){
+                  setState(() {
+                    tiempopom = int.parse(valor);
+                    if(tiempopom>90)tiempopom=90;
+                    setPom(tiempopom);
+                                    });
+                },
+                )
+                :TextButton(
+                  child: Text(
+                    "${min10*10+min}",
+                    style: TextStyle(
+                      fontSize: 25,
+                      color: currentTheme.isDarkTheme()?Colors.white:Colors.black,
+                    ),
+                  ),
+                  onPressed: (){
+                    setState(() {
+                      editar=!editar;
+                                });
+                    
+                  },
+                ),//buscar aquí                
+              ),
+              editar
+              ?FloatingActionButton(
+                mini: true,
+                backgroundColor: currentTheme.isDarkTheme()
+                  ?(indicador
+                    ?(descanso?Colors.pink[600]
+                      :Colors.cyan[800])
+                    :Colors.blue[400])
+                  :(indicador
+                    ?(descanso?Colors.pink[300]
+                      :Colors.lightBlueAccent[400])
+                    :Colors.blue[100]),
+                  //isActive?Icons.pause:Icons.play_arrow
+                child: Icon(Icons.check,
+                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
+                onPressed: (){
+                  setState(() {
+                    editar=!editar;
+                                    });
+                }
+                )
+              :Container()
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 50,
+                child: Icon(Icons.lock_open_outlined,color: currentTheme.isDarkTheme()?Colors.white:Colors.black)
+              ),
+              SizedBox(
+                height: 50,
+                width: 200,
+                child:Slider(
+                  value: (d_min10*10+d_min).toDouble(),
+                  min: 0,
+                  max: 30,
+                  activeColor: currentTheme.isDarkTheme()
+                  ?(indicador
+                    ?(descanso?Colors.pink[600]
+                      :Colors.cyan[800])
+                    :Colors.blue[400])
+                  :(indicador
+                    ?(descanso?Colors.pink[300]
+                      :Colors.lightBlueAccent[400])
+                    :Colors.blue[100]),
+                  onChanged: (newValue){
+                    setState(() {
+                      tiempodescanso=newValue.toInt();
+                      setDes(tiempodescanso);
+                                      });
+                  },
+                ),
+              ),
+              
+              SizedBox(
+                width: 50,
+                height: 50,
+                child:editar2
+                ?TextField(
+                decoration: InputDecoration(
+                  //hintText: 'Minutos',
+                  //labelText: 'Minutos',
+                  //prefixIcon: Icon(Icons.charging_station_rounded),
+                  border: OutlineInputBorder(),
+                ),
+                keyboardAppearance: currentTheme.isDarkTheme()?Brightness.dark:Brightness.light,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: currentTheme.isDarkTheme()?Colors.white:Colors.black),
+                //maxLength: 2,
+                
+                onChanged: (valor){
+                  setState(() {
+                    tiempodescanso = int.parse(valor);
+                    if(tiempodescanso>30)tiempodescanso=30;
+                    setDes(tiempodescanso);
+                                    });
+                },
+                )
+                :TextButton(
+                  child: Text(
+                    "${d_min10*10+d_min}",//buscame
+                    style: TextStyle(
+                      fontSize: 25,
+                      color: currentTheme.isDarkTheme()?Colors.white:Colors.black,
+                    ),
+                  ),
+                  onPressed: (){
+                    setState(() {
+                      editar2=!editar2;
+                                });
+                    
+                  },
+                ),//buscar aquí                
+              ),
+              editar2
+              ?FloatingActionButton(
+                mini: true,
+                backgroundColor: currentTheme.isDarkTheme()
+                  ?(indicador
+                    ?(descanso?Colors.pink[600]
+                      :Colors.cyan[800])
+                    :Colors.blue[400])
+                  :(indicador
+                    ?(descanso?Colors.pink[300]
+                      :Colors.lightBlueAccent[400])
+                    :Colors.blue[100]),
+                  //isActive?Icons.pause:Icons.play_arrow
+                child: Icon(Icons.check,
+                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
+                onPressed: (){
+                  setState(() {
+                    editar2=!editar2;
+                                    });
+                }
+                )
+              :Container()
+            ],
+          ),
+        ],
+      ),
+    ),
 
             SizedBox(
                   height: 30.0,
                 ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: [/*
                 !indicador?FloatingActionButton(
-                  backgroundColor: currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
+                  backgroundColor: currentTheme.isDarkTheme()
+                  ?(indicador
+                    ?(descanso?Colors.pink[600]
+                      :Colors.cyan[800])
+                    :Colors.blue[400])
+                  :(indicador
+                    ?(descanso?Colors.pink[300]
+                      :Colors.lightBlueAccent[400])
+                    :Colors.blue[100]),
                   //isActive?Icons.pause:Icons.play_arrow
                   child: Icon(Icons.hourglass_top_rounded,
                     color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
                     onPressed: () {
-                        configura(context);
+                      
+                        muestraSlider(context);               
+                                            
+                      
                       },
-                ):Container(),
+                ):Container(),*/
 
                 SizedBox(
                   width: !indicador?30.0:0,
                 ),
 
                 FloatingActionButton(
-                  backgroundColor: currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
+                  backgroundColor: currentTheme.isDarkTheme()
+                  ?(indicador
+                    ?(descanso?Colors.pink[600]
+                      :Colors.cyan[800])
+                    :Colors.blue[400])
+                  :(indicador
+                    ?(descanso?Colors.pink[300]
+                      :Colors.lightBlueAccent[400])
+                    :Colors.blue[100]),
                   //isActive?Icons.pause:Icons.play_arrow
                   child: Icon(
                     indicador?Icons.skip_next:Icons.play_arrow,
@@ -538,16 +863,25 @@ class _HomePageState extends State<HomePage> {
                   width: 30.0,
                 ),
 
-                FloatingActionButton(
-                  backgroundColor: currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
+                indicador?FloatingActionButton(
+                  backgroundColor: currentTheme.isDarkTheme()
+                  ?(indicador
+                    ?(descanso?Colors.pink[600]
+                      :Colors.cyan[800])
+                    :Colors.blue[400])
+                  :(indicador
+                    ?(descanso?Colors.pink[300]
+                      :Colors.lightBlueAccent[400])
+                    :Colors.blue[100]),
                   child: Icon(
                     !indicador?Icons.charging_station_rounded:Icons.stop,
                     color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
                   ),
                   onPressed: () {
-                        indicador?setState(enStop):configuraDescanso(context);
+                        setState(enStop);
                       },
                 )
+                :Container(),
               ],
             ),
 
@@ -560,12 +894,37 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: 40.0,
               child: indicador?Text(
-                descanso?"DESCANSANDO...":"TRABAJANDO!!!",
+                descanso?"¡¡TE GANASTE UN BREAK!!":"¡¡NO VEAS ESTO!!",
                 style: TextStyle(
                   color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+                  fontSize: 30.0
                 ),
               ):Container()
             ),
+
+            SizedBox(
+                  height: indicador?20.0:0,
+                ),
+
+            indicador?SizedBox(
+              height: 55.0,
+              width:  55.0,
+              child:Center(
+                child: Icon(
+                descanso?Icons.celebration:Icons.no_cell_rounded,
+                size: 55.0,
+                color: currentTheme.isDarkTheme()
+                  ?(
+                    descanso?Colors.pink[600]
+                    :Colors.cyan[800]
+                    )
+                  :(
+                    descanso?Colors.pink[300]
+                    :Colors.lightBlueAccent[400]
+                    ),
+                ),
+              ) 
+            ):Container(),
 
             SizedBox(
                   height: indicador?20.0:0,
@@ -610,7 +969,15 @@ class _HomePageState extends State<HomePage> {
 
       //CANTIDAD DE POMODOROS
       bottomNavigationBar: BottomAppBar(
-        color: currentTheme.isDarkTheme() ? Colors.black12 : Colors.blue[100],
+        color: currentTheme.isDarkTheme()
+                  ?(indicador
+                    ?(descanso?Colors.pink[600]
+                      :Colors.cyan[800])
+                    :Colors.black12)
+                  :(indicador
+                    ?(descanso?Colors.pink[300]
+                      :Colors.lightBlueAccent[400])
+                    :Colors.blue[100]),
         child: Container(
           height: 80,
           child: Row(
@@ -623,31 +990,31 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),*/
               maxpom>0?IconButton(
-                  icon: Icon(Icons.airline_seat_recline_normal_rounded),
+                  icon: Icon(Icons.bolt),
                   onPressed: () {},
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                   iconSize: 50):Container(), 
               maxpom>1?IconButton(
-                  icon: Icon(Icons.airline_seat_recline_normal_rounded),
+                  icon: Icon(Icons.bolt),
                   onPressed: () {},
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                   iconSize: 50):Container(),
               maxpom>2?IconButton(
-                  icon: Icon(Icons.airline_seat_recline_normal_rounded),
+                  icon: Icon(Icons.bolt),
                   onPressed: () {},
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                   iconSize: 50):Container(),
               maxpom>3?IconButton(
-                  icon: Icon(Icons.airline_seat_recline_normal_rounded),
+                  icon: Icon(Icons.bolt),
                   onPressed: () {},
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                   iconSize: 50):Container(),
               maxpom>4?IconButton(
-                  icon: Icon(Icons.airline_seat_recline_normal_rounded),
+                  icon: Icon(Icons.bolt),
                   onPressed: () {},
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
