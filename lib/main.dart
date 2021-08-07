@@ -6,6 +6,7 @@ import 'package:pomodoro_flutter/providers/theme.dart';
 import 'package:pomodoro_flutter/models/theme_preferences.dart';
 import 'package:liquid_progress_indicator_ns/liquid_progress_indicator.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:pomodoro_flutter/mis__iconos_icons.dart';
 
 void main() {
   runApp(MyApp());
@@ -506,463 +507,458 @@ class _HomePageState extends State<HomePage> {
       ),
       
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+        child: ListView(
           children: [
-            Container(
-              padding: EdgeInsets.all(20.0),
-              margin: EdgeInsets.all(20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      if(!indicador)setState(incMin10);
-                    },
-                    child: Text(
-                      '$min10',
-                      style: TextStyle(
-                        fontSize: 30.0,
-                        color: currentTheme.isDarkTheme()
-                            ? Colors.white
-                            : Colors.black,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 30,
+                ),
+                SizedBox(
+                  height: 300.0,
+                  width:  300.0,
+                  child: LiquidCircularProgressIndicator(
+                    value: percent, // Defaults to 0.5.
+                    backgroundColor: currentTheme.isDarkTheme() ? Colors.black12 : Colors.grey[100],
+                    valueColor: AlwaysStoppedAnimation(
+                      currentTheme.isDarkTheme()?
+                      (descanso?Colors.pink[600]
+                      :Colors.cyan[800]) 
+                      : (descanso?Colors.pink[300]
+                      :Colors.lightBlueAccent[400])
+                      ), // Defaults to the current Theme's accentColor.
+                    borderColor: Colors.transparent,
+                    borderWidth: 5.0,
+                    direction: Axis.vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.vertical.
+                    center: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          if(!indicador)setState(incMin10);
+                        },
+                        child: Text(
+                          '$min10',
+                          style: TextStyle(
+                            fontSize: 30.0,
+                            color: currentTheme.isDarkTheme()
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        if(!indicador)setState(incMin);
-                      },
-                      child: Text(
-                        '$min',
-                        style: TextStyle(
-                          fontSize: 30.0,
-                          color: currentTheme.isDarkTheme()
-                              ? Colors.white
-                              : Colors.black,
-                        ),
-                      )),
-                  Text(':',style: TextStyle(
-                        fontSize: 30.0,
-                        color: currentTheme.isDarkTheme()
-                          ? Colors.white
-                          : Colors.black,
-                        ),
-                      ),
-                  TextButton(
-                      onPressed: () {
-                        if(!indicador)setState(incSeg10);
-                      },
-                      child: Text(
-                        '$seg10',
-                        style: TextStyle(
-                          fontSize: 30.0,
-                          color: currentTheme.isDarkTheme()
-                              ? Colors.white
-                              : Colors.black,
-                        ),
-                      )),
-                  TextButton(
-                      onPressed: () {
-                        if(!indicador)setState(incSeg);
-                      },
-                      child: Text(
-                        '$seg',
-                        style: TextStyle(
-                          fontSize: 30.0,
-                          color: currentTheme.isDarkTheme()
-                              ? Colors.white
-                              : Colors.black,
-                        ),
-                      )),
-                ],
-              ),
-            ),
-
-            SizedBox(
-              height: 200.0,
-              width:  200.0,
-              child: LiquidCircularProgressIndicator(
-                value: percent, // Defaults to 0.5.
-                backgroundColor: currentTheme.isDarkTheme() ? Colors.black12 : Colors.grey[100],
-                valueColor: AlwaysStoppedAnimation(
-                  currentTheme.isDarkTheme() ? 
-                  (descanso?Colors.pink[600]
-                  :Colors.cyan[800]) 
-                  : (descanso?Colors.pink[300]
-                  :Colors.lightBlueAccent[400])
-                  ), // Defaults to the current Theme's accentColor.
-                borderColor: Colors.transparent,
-                borderWidth: 5.0,
-                direction: Axis.vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.vertical.
-                center: Text("$valorPorcentaje%",
+                      TextButton(
+                          onPressed: () {
+                            if(!indicador)setState(incMin);
+                          },
+                          child: Text(
+                            '$min',
                             style: TextStyle(
-                              fontSize: 35.0,
+                              fontSize: 30.0,
                               color: currentTheme.isDarkTheme()
                                   ? Colors.white
                                   : Colors.black,
-                        ),),
-              ),
-            ),
-            //ACA IRA LA RUEDITA
-            
-            indicador
+                            ),
+                          )),
+                      Text(':',style: TextStyle(
+                            fontSize: 30.0,
+                            color: currentTheme.isDarkTheme()
+                              ? Colors.white
+                              : Colors.black,
+                            ),
+                          ),
+                      TextButton(
+                          onPressed: () {
+                            if(!indicador)setState(incSeg10);
+                          },
+                          child: Text(
+                            '$seg10',
+                            style: TextStyle(
+                              fontSize: 30.0,
+                              color: currentTheme.isDarkTheme()
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          )),
+                      TextButton(
+                          onPressed: () {
+                            if(!indicador)setState(incSeg);
+                          },
+                          child: Text(
+                            '$seg',
+                            style: TextStyle(
+                              fontSize: 30.0,
+                              color: currentTheme.isDarkTheme()
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          )),
+                    ],
+                  ),
+                  ),
+                ),
+                //ACA IRA LA RUEDITA
+                
+                indicador
     ?Container()
     :Container(
       child: Column(
-        children: [
-          SizedBox(height: 30,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                height: 50,
-                child: Icon(Icons.lock_clock,color: currentTheme.isDarkTheme()?Colors.white:Colors.black)
-              ),
-              SizedBox(
-                height: 50,
-                width: 200,
-                child:Slider(
-                  value: (min10*10+min).toDouble(),
-                  min: 0,
-                  max: 90,
-                  activeColor: currentTheme.isDarkTheme()
-                  ?(indicador
-                    ?(descanso?Colors.pink[600]
-                      :Colors.cyan[800])
-                    :Colors.blue[400])
-                  :(indicador
-                    ?(descanso?Colors.pink[300]
-                      :Colors.lightBlueAccent[400])
-                    :Colors.blue[100]),
-                  onChanged: (newValue){
-                    setState(() {
-                      tiempopom=newValue.toInt();
-                      setPom(tiempopom);
-                                      });
-                  },
-                ),
-              ),
-              
-              SizedBox(
-                width: 50,
-                height: 50,
-                child:editar
-                ?TextField(
-                decoration: InputDecoration(
-                  //hintText: 'Minutos',
-                  //labelText: 'Minutos',
-                  //prefixIcon: Icon(Icons.charging_station_rounded),
-                  border: OutlineInputBorder(),
-                ),
-                keyboardAppearance: currentTheme.isDarkTheme()?Brightness.dark:Brightness.light,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: currentTheme.isDarkTheme()?Colors.white:Colors.black),
-                //maxLength: 2,
-                
-                onChanged: (valor){
-                  setState(() {
-                    tiempopom = int.parse(valor);
-                    if(tiempopom>90)tiempopom=90;
-                    setPom(tiempopom);
-                                    });
-                },
-                )
-                :TextButton(
-                  child: Text(
-                    "${min10*10+min}",
-                    style: TextStyle(
-                      fontSize: 25,
-                      color: currentTheme.isDarkTheme()?Colors.white:Colors.black,
+              SizedBox(height: 30,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 50,
+                    child: Icon(MisIconos.mind,color: currentTheme.isDarkTheme()?Colors.white:Colors.black)
+                  ),
+                  SizedBox(
+                    height: 50,
+                    width: 200,
+                    child:Slider(
+                      value: (min10*10+min).toDouble(),
+                      min: 0,
+                      max: 90,
+                      activeColor: currentTheme.isDarkTheme()
+                      ?(indicador
+                        ?(descanso?Colors.pink[600]
+                          :Colors.cyan[800])
+                        :Colors.blue[400])
+                      :(indicador
+                        ?(descanso?Colors.pink[300]
+                          :Colors.lightBlueAccent[400])
+                        :Colors.blue[100]),
+                      onChanged: (newValue){
+                        setState(() {
+                          tiempopom=newValue.toInt();
+                          setPom(tiempopom);
+                                          });
+                      },
                     ),
                   ),
-                  onPressed: (){
-                    setState(() {
-                      editar=!editar;
-                                });
+                  
+                  SizedBox(
+                    width: 50,
+                    height: 50,
+                    child:editar
+                    ?TextField(
+                    decoration: InputDecoration(
+                      //hintText: 'Minutos',
+                      //labelText: 'Minutos',
+                      //prefixIcon: Icon(Icons.charging_station_rounded),
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardAppearance: currentTheme.isDarkTheme()?Brightness.dark:Brightness.light,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: currentTheme.isDarkTheme()?Colors.white:Colors.black),
+                    //maxLength: 2,
                     
-                  },
-                ),//buscar aquí                
-              ),
-              editar
-              ?FloatingActionButton(
-                mini: true,
-                backgroundColor: currentTheme.isDarkTheme()
-                  ?(indicador
-                    ?(descanso?Colors.pink[600]
-                      :Colors.cyan[800])
-                    :Colors.blue[400])
-                  :(indicador
-                    ?(descanso?Colors.pink[300]
-                      :Colors.lightBlueAccent[400])
-                    :Colors.blue[100]),
-                  //isActive?Icons.pause:Icons.play_arrow
-                child: Icon(Icons.check,
-                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
-                onPressed: (){
-                  setState(() {
-                    editar=!editar;
+                    onChanged: (valor){
+                      setState(() {
+                        tiempopom = int.parse(valor);
+                        if(tiempopom>90)tiempopom=90;
+                        setPom(tiempopom);
+                                        });
+                    },
+                    )
+                    :TextButton(
+                      child: Text(
+                        "${min10*10+min}",
+                        style: TextStyle(
+                          fontSize: 25,
+                          color: currentTheme.isDarkTheme()?Colors.white:Colors.black,
+                        ),
+                      ),
+                      onPressed: (){
+                        setState(() {
+                          editar=!editar;
                                     });
-                }
-                )
-              :Container()
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 50,
-                child: Icon(Icons.lock_open_outlined,color: currentTheme.isDarkTheme()?Colors.white:Colors.black)
+                        
+                      },
+                    ),//buscar aquí                
+                  ),
+                  editar
+                  ?FloatingActionButton(
+                    mini: true,
+                    backgroundColor: currentTheme.isDarkTheme()
+                      ?(indicador
+                        ?(descanso?Colors.pink[600]
+                          :Colors.cyan[800])
+                        :Colors.blue[400])
+                      :(indicador
+                        ?(descanso?Colors.pink[300]
+                          :Colors.lightBlueAccent[400])
+                        :Colors.blue[100]),
+                      //isActive?Icons.pause:Icons.play_arrow
+                    child: Icon(Icons.check,
+                        color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
+                    onPressed: (){
+                      setState(() {
+                        editar=!editar;
+                                        });
+                    }
+                    )
+                  :Container()
+                ],
               ),
-              SizedBox(
-                height: 50,
-                width: 200,
-                child:Slider(
-                  value: (d_min10*10+d_min).toDouble(),
-                  min: 0,
-                  max: 30,
-                  activeColor: currentTheme.isDarkTheme()
-                  ?(indicador
-                    ?(descanso?Colors.pink[600]
-                      :Colors.cyan[800])
-                    :Colors.blue[400])
-                  :(indicador
-                    ?(descanso?Colors.pink[300]
-                      :Colors.lightBlueAccent[400])
-                    :Colors.blue[100]),
-                  onChanged: (newValue){
-                    setState(() {
-                      tiempodescanso=newValue.toInt();
-                      setDes(tiempodescanso);
-                                      });
-                  },
-                ),
-              ),
-              
-              SizedBox(
-                width: 50,
-                height: 50,
-                child:editar2
-                ?TextField(
-                decoration: InputDecoration(
-                  //hintText: 'Minutos',
-                  //labelText: 'Minutos',
-                  //prefixIcon: Icon(Icons.charging_station_rounded),
-                  border: OutlineInputBorder(),
-                ),
-                keyboardAppearance: currentTheme.isDarkTheme()?Brightness.dark:Brightness.light,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: currentTheme.isDarkTheme()?Colors.white:Colors.black),
-                //maxLength: 2,
-                
-                onChanged: (valor){
-                  setState(() {
-                    tiempodescanso = int.parse(valor);
-                    if(tiempodescanso>30)tiempodescanso=30;
-                    setDes(tiempodescanso);
-                                    });
-                },
-                )
-                :TextButton(
-                  child: Text(
-                    "${d_min10*10+d_min}",//buscame
-                    style: TextStyle(
-                      fontSize: 25,
-                      color: currentTheme.isDarkTheme()?Colors.white:Colors.black,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 50,
+                    child: Icon(MisIconos.hot_coffee,color: currentTheme.isDarkTheme()?Colors.white:Colors.black)
+                  ),
+                  SizedBox(
+                    height: 50,
+                    width: 200,
+                    child:Slider(
+                      value: (d_min10*10+d_min).toDouble(),
+                      min: 0,
+                      max: 30,
+                      activeColor: currentTheme.isDarkTheme()
+                      ?(indicador
+                        ?(descanso?Colors.pink[600]
+                          :Colors.cyan[800])
+                        :Colors.blue[400])
+                      :(indicador
+                        ?(descanso?Colors.pink[300]
+                          :Colors.lightBlueAccent[400])
+                        :Colors.blue[100]),
+                      onChanged: (newValue){
+                        setState(() {
+                          tiempodescanso=newValue.toInt();
+                          setDes(tiempodescanso);
+                                          });
+                      },
                     ),
                   ),
-                  onPressed: (){
-                    setState(() {
-                      editar2=!editar2;
-                                });
+                  
+                  SizedBox(
+                    width: 50,
+                    height: 50,
+                    child:editar2
+                    ?TextField(
+                    decoration: InputDecoration(
+                      //hintText: 'Minutos',
+                      //labelText: 'Minutos',
+                      //prefixIcon: Icon(Icons.charging_station_rounded),
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardAppearance: currentTheme.isDarkTheme()?Brightness.dark:Brightness.light,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: currentTheme.isDarkTheme()?Colors.white:Colors.black),
+                    //maxLength: 2,
                     
-                  },
-                ),//buscar aquí                
-              ),
-              editar2
-              ?FloatingActionButton(
-                mini: true,
-                backgroundColor: currentTheme.isDarkTheme()
-                  ?(indicador
-                    ?(descanso?Colors.pink[600]
-                      :Colors.cyan[800])
-                    :Colors.blue[400])
-                  :(indicador
-                    ?(descanso?Colors.pink[300]
-                      :Colors.lightBlueAccent[400])
-                    :Colors.blue[100]),
-                  //isActive?Icons.pause:Icons.play_arrow
-                child: Icon(Icons.check,
-                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
-                onPressed: (){
-                  setState(() {
-                    editar2=!editar2;
+                    onChanged: (valor){
+                      setState(() {
+                        tiempodescanso = int.parse(valor);
+                        if(tiempodescanso>30)tiempodescanso=30;
+                        setDes(tiempodescanso);
+                                        });
+                    },
+                    )
+                    :TextButton(
+                      child: Text(
+                        "${d_min10*10+d_min}",//buscame
+                        style: TextStyle(
+                          fontSize: 25,
+                          color: currentTheme.isDarkTheme()?Colors.white:Colors.black,
+                        ),
+                      ),
+                      onPressed: (){
+                        setState(() {
+                          editar2=!editar2;
                                     });
-                }
-                )
-              :Container()
+                        
+                      },
+                    ),//buscar aquí                
+                  ),
+                  editar2
+                  ?FloatingActionButton(
+                    mini: true,
+                    backgroundColor: currentTheme.isDarkTheme()
+                      ?(indicador
+                        ?(descanso?Colors.pink[600]
+                          :Colors.cyan[800])
+                        :Colors.blue[400])
+                      :(indicador
+                        ?(descanso?Colors.pink[300]
+                          :Colors.lightBlueAccent[400])
+                        :Colors.blue[100]),
+                      //isActive?Icons.pause:Icons.play_arrow
+                    child: Icon(Icons.check,
+                        color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
+                    onPressed: (){
+                      setState(() {
+                        editar2=!editar2;
+                                        });
+                    }
+                    )
+                  :Container()
+                ],
+              ),
             ],
-          ),
-        ],
       ),
     ),
 
-            SizedBox(
-                  height: 30.0,
-                ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [/*
-                !indicador?FloatingActionButton(
-                  backgroundColor: currentTheme.isDarkTheme()
-                  ?(indicador
-                    ?(descanso?Colors.pink[600]
-                      :Colors.cyan[800])
-                    :Colors.blue[400])
-                  :(indicador
-                    ?(descanso?Colors.pink[300]
-                      :Colors.lightBlueAccent[400])
-                    :Colors.blue[100]),
-                  //isActive?Icons.pause:Icons.play_arrow
-                  child: Icon(Icons.hourglass_top_rounded,
-                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
-                    onPressed: () {
-                      
-                        muestraSlider(context);               
-                                            
-                      
-                      },
-                ):Container(),*/
-
                 SizedBox(
-                  width: !indicador?30.0:0,
-                ),
-
-                FloatingActionButton(
-                  backgroundColor: currentTheme.isDarkTheme()
-                  ?(indicador
-                    ?(descanso?Colors.pink[600]
-                      :Colors.cyan[800])
-                    :Colors.blue[400])
-                  :(indicador
-                    ?(descanso?Colors.pink[300]
-                      :Colors.lightBlueAccent[400])
-                    :Colors.blue[100]),
-                  //isActive?Icons.pause:Icons.play_arrow
-                  child: Icon(
-                    indicador?Icons.skip_next:Icons.play_arrow,
-                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
-                    onPressed: () {
-                        indicador?setState(nextPomodoro):setState(enPlay);
-                      },
-                ),
-                SizedBox(
-                  width: 30.0,
-                ),
-
-                indicador?FloatingActionButton(
-                  backgroundColor: currentTheme.isDarkTheme()
-                  ?(indicador
-                    ?(descanso?Colors.pink[600]
-                      :Colors.cyan[800])
-                    :Colors.blue[400])
-                  :(indicador
-                    ?(descanso?Colors.pink[300]
-                      :Colors.lightBlueAccent[400])
-                    :Colors.blue[100]),
-                  child: Icon(
-                    !indicador?Icons.charging_station_rounded:Icons.stop,
-                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
-                  ),
-                  onPressed: () {
-                        setState(enStop);
-                      },
-                )
-                :Container(),
-              ],
-            ),
-
-            SizedBox(
-                  height: 6.0,
-                ),
-            
-            indicador?SizedBox(height: 60.0):Container(),
-
-            SizedBox(
-              height: 40.0,
-              child: indicador?Text(
-                descanso?"¡¡TE GANASTE UN BREAK!!":"¡¡NO VEAS ESTO!!",
-                style: TextStyle(
-                  color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  fontSize: 30.0
-                ),
-              ):Container()
-            ),
-
-            SizedBox(
-                  height: indicador?20.0:0,
-                ),
-
-            indicador?SizedBox(
-              height: 55.0,
-              width:  55.0,
-              child:Center(
-                child: Icon(
-                descanso?Icons.celebration:Icons.no_cell_rounded,
-                size: 55.0,
-                color: currentTheme.isDarkTheme()
-                  ?(
-                    descanso?Colors.pink[600]
-                    :Colors.cyan[800]
-                    )
-                  :(
-                    descanso?Colors.pink[300]
-                    :Colors.lightBlueAccent[400]
+                      height: 30.0,
                     ),
-                ),
-              ) 
-            ):Container(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [/*
+                    !indicador?FloatingActionButton(
+                      backgroundColor: currentTheme.isDarkTheme()
+                      ?(indicador
+                        ?(descanso?Colors.pink[600]
+                          :Colors.cyan[800])
+                        :Colors.blue[400])
+                      :(indicador
+                        ?(descanso?Colors.pink[300]
+                          :Colors.lightBlueAccent[400])
+                        :Colors.blue[100]),
+                      //isActive?Icons.pause:Icons.play_arrow
+                      child: Icon(Icons.hourglass_top_rounded,
+                        color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
+                        onPressed: () {
+                          
+                            muestraSlider(context);               
+                                                
+                          
+                          },
+                    ):Container(),*/
 
-            SizedBox(
-                  height: indicador?20.0:0,
+                    SizedBox(
+                      width: !indicador?30.0:0,
+                    ),
+
+                    FloatingActionButton(
+                      backgroundColor: currentTheme.isDarkTheme()
+                      ?(indicador
+                        ?(descanso?Colors.pink[600]
+                          :Colors.cyan[800])
+                        :Colors.blue[400])
+                      :(indicador
+                        ?(descanso?Colors.pink[300]
+                          :Colors.lightBlueAccent[400])
+                        :Colors.blue[100]),
+                      //isActive?Icons.pause:Icons.play_arrow
+                      child: Icon(
+                        indicador?Icons.skip_next:Icons.play_arrow,
+                        color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
+                        onPressed: () {
+                            indicador?setState(nextPomodoro):setState(enPlay);
+                          },
+                    ),
+                    SizedBox(
+                      width: 30.0,
+                    ),
+
+                    indicador?FloatingActionButton(
+                      backgroundColor: currentTheme.isDarkTheme()
+                      ?(indicador
+                        ?(descanso?Colors.pink[600]
+                          :Colors.cyan[800])
+                        :Colors.blue[400])
+                      :(indicador
+                        ?(descanso?Colors.pink[300]
+                          :Colors.lightBlueAccent[400])
+                        :Colors.blue[100]),
+                      child: Icon(
+                        !indicador?Icons.charging_station_rounded:Icons.stop,
+                        color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
+                      ),
+                      onPressed: () {
+                            setState(enStop);
+                          },
+                    )
+                    :Container(),
+                  ],
                 ),
-            !indicador?Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FloatingActionButton(
-                  child: Icon(
-                    Icons.arrow_circle_up_rounded,
-                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
-                  ),
-                  backgroundColor:
-                      currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
-                  elevation: 0,
-                  highlightElevation: 0,
-                  onPressed: () {
-                        setState(incPom);
-                      },
-                ),
+
                 SizedBox(
-                  width: 30.0,
+                      height: 6.0,
+                    ),
+                
+                indicador?SizedBox(height: 60.0):Container(),
+
+                SizedBox(
+                  height: 40.0,
+                  child: indicador?Text(
+                    descanso?"¡¡TE GANASTE UN BREAK!!":"¡¡NO VEAS ESTO!!",
+                    style: TextStyle(
+                      color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+                      fontSize: 30.0
+                    ),
+                  ):Container()
                 ),
-                FloatingActionButton(
-                  child: Icon(
-                    Icons.arrow_circle_down_rounded,
-                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
-                  ),
-                  backgroundColor:
-                      currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
-                  elevation: 0,
-                  highlightElevation: 0,
-                  onPressed: () {
-                        setState(decPom);
-                      },
-                ),
+
+                SizedBox(
+                      height: indicador?20.0:0,
+                    ),
+
+                indicador?SizedBox(
+                  height: 55.0,
+                  width:  55.0,
+                  child:Center(
+                    child: Icon(
+                    descanso?Icons.celebration:Icons.no_cell_rounded,
+                    size: 55.0,
+                    color: currentTheme.isDarkTheme()
+                      ?(
+                        descanso?Colors.pink[600]
+                        :Colors.cyan[800]
+                        )
+                      :(
+                        descanso?Colors.pink[300]
+                        :Colors.lightBlueAccent[400]
+                        ),
+                    ),
+                  ) 
+                ):Container(),
+
+                SizedBox(
+                      height: indicador?20.0:0,
+                    ),
+                !indicador?Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FloatingActionButton(
+                      child: Icon(
+                        Icons.arrow_circle_up_rounded,
+                        color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
+                      ),
+                      backgroundColor:
+                          currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
+                      elevation: 0,
+                      highlightElevation: 0,
+                      onPressed: () {
+                            setState(incPom);
+                          },
+                    ),
+                    SizedBox(
+                      width: 30.0,
+                    ),
+                    FloatingActionButton(
+                      child: Icon(
+                        Icons.arrow_circle_down_rounded,
+                        color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
+                      ),
+                      backgroundColor:
+                          currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
+                      elevation: 0,
+                      highlightElevation: 0,
+                      onPressed: () {
+                            setState(decPom);
+                          },
+                    ),
+                  ],
+                ):Container(),
               ],
-            ):Container(),
+            ),
           ],
         )
       ),
@@ -989,6 +985,18 @@ class _HomePageState extends State<HomePage> {
                   color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                 ),
               ),*/
+              Slider(
+                value: maxpom.toDouble(),
+                min: 0,
+                max: 5,
+                divisions: 6, 
+                onChanged: (newvalue){
+                  setState((){
+                    maxpom=newvalue.toInt();
+                  });
+                }
+                ),
+                /*
               maxpom>0?IconButton(
                   icon: Icon(Icons.bolt),
                   onPressed: () {},
@@ -1019,18 +1027,7 @@ class _HomePageState extends State<HomePage> {
                   color:
                       currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                   iconSize: 50):Container(),
-              /*maxpom>5?IconButton(
-                  icon: Icon(Icons.bolt),
-                  onPressed: () {},
-                  color:
-                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50):Container(),
-              maxpom>6?IconButton(
-                  icon: Icon(Icons.bolt),
-                  onPressed: () {},
-                  color:
-                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50):Container(),*/
+                  */
             ],
           ),
         ),
