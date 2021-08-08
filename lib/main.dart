@@ -122,6 +122,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   enPlay(){
+    pausado=false;
     tiempopom=(min10*10+min)*60 + seg10*10+seg;
     tiempodescanso=(d_min10*10+d_min)*60 + d_seg10*10+d_seg;
     if(maxpom>0 && tiempodescanso>0 && tiempopom>0){
@@ -140,7 +141,7 @@ class _HomePageState extends State<HomePage> {
     StopTimer();
     if(!descanso){//estaba en modo pomodoro
       contador++;
-      maxpom--;
+      if(maxpom>1)maxpom--;
     }
     descanso=!descanso;
     descanso?valorDescanso():devuelveValor();
@@ -156,6 +157,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   enStop(){
+    pausado=false;
     indicador=false;
     descanso=false;
     percent=0;
@@ -880,15 +882,15 @@ class _HomePageState extends State<HomePage> {
                       height: 6.0,
                     ),
                 
-                indicador?SizedBox(height: 60.0):Container(),
+                indicador?SizedBox(height: 30.0):Container(),
 
                 SizedBox(
                   height: 40.0,
                   child: indicador?Text(
-                    descanso?"¡¡TE GANASTE UN BREAK!!":"¡¡NO VEAS ESTO!!",
+                    descanso?"¡¡TE GANASTE UN BREAK!!":"¡¡NO VEAS TU CELULAR!!",
                     style: TextStyle(
                       color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                      fontSize: 30.0
+                      fontSize: 27.0
                     ),
                   ):Container()
                 ),
