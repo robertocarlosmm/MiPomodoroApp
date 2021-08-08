@@ -1,3 +1,5 @@
+//import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +9,9 @@ import 'package:pomodoro_flutter/models/theme_preferences.dart';
 import 'package:liquid_progress_indicator_ns/liquid_progress_indicator.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:pomodoro_flutter/mis__iconos_icons.dart';
+import 'package:pomodoro_flutter/SliderLabel.dart';
+import 'package:pomodoro_flutter/SliderRotable.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -55,13 +60,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int min10=2, min=0, seg10=0, seg=0, contador=0, maxpom=0,tiempopom=0,_start=0;
+  int min10=2, min=0, seg10=0, seg=0, contador=0, maxpom=1,tiempopom=0,_start=0;
   bool indicador=false,descanso=false,fin=false;
   double percent=0,segPercent=0;
   int valorPorcentaje=0,tiempodescanso=0,temporal=0;
   int d_min10=0, d_min=5, d_seg10=0, d_seg=0;
   bool p_select=false,d_select=false;
-  bool editar=false,editar2=false;
+  bool editar=false,editar2=false,pausado=false;
   @override
   void initState() {
     super.initState();
@@ -159,6 +164,16 @@ class _HomePageState extends State<HomePage> {
     devuelveValor();
   }
 
+  enPausa(){
+    pausado=true;
+    StopTimer();
+  }
+
+  enContinuacion(){
+    pausado=false;
+    startTimer();
+  }
+
   devuelveValor(){
     min10=(tiempopom~/60)~/10;
     min=(tiempopom~/60)%10;
@@ -174,6 +189,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   incPom(){
+    if(indicador)return;
     if(maxpom<5) maxpom++;
   }
 
@@ -205,7 +221,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   decPom(){
-    (maxpom>0)?maxpom--:maxpom=0;
+    if(indicador)return;
+    (maxpom>1)?maxpom--:maxpom=1;
   }
 
   incSeg() {
@@ -280,6 +297,14 @@ class _HomePageState extends State<HomePage> {
     d_seg10=0;
     d_seg=0;
   }
+
+  setPomodoros(int num){
+    int temp;
+    temp=maxpom;
+    if(!indicador) temp=num;
+    maxpom=temp;
+  }
+
   double currentSlider=0;
   double temporal_pom=0;
   prototipo(){
@@ -288,6 +313,7 @@ class _HomePageState extends State<HomePage> {
     :Container(
       child: Column(
         children: [
+          
           Row(
             children: [
               Slider(
@@ -457,6 +483,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final currentTheme = Provider.of<ThemeProvider>(context);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return Scaffold(
       resizeToAvoidBottomInset:false,
       backgroundColor:
@@ -475,9 +502,9 @@ class _HomePageState extends State<HomePage> {
                       :Colors.cyan[800])
                     :Colors.black12)
                   :(indicador
-                    ?(descanso?Colors.pink[300]
-                      :Colors.lightBlueAccent[400])
-                    :Colors.blue[100]),
+                    ?(descanso?Colors.pink[400]
+                      :Colors.greenAccent[400])
+                    :Colors.blue),
             //currentTheme.isDarkTheme() ? Colors.black12 : Colors.blue[100],
         actions: [
           Row(
@@ -489,7 +516,7 @@ class _HomePageState extends State<HomePage> {
               Switch(
                   activeColor: 
                     indicador
-                      ?(descanso?Colors.pink[300]
+                      ?(descanso?Colors.pink[400]
                       :Colors.cyan[400])
                     :Colors.blue[400],
                   value: currentTheme.isDarkTheme(),
@@ -513,20 +540,22 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(
-                  height: 30,
+                  height: 15,
                 ),
                 SizedBox(
-                  height: 300.0,
-                  width:  300.0,
+                  height: 280.0,
+                  width:  280.0,
                   child: LiquidCircularProgressIndicator(
                     value: percent, // Defaults to 0.5.
                     backgroundColor: currentTheme.isDarkTheme() ? Colors.black12 : Colors.grey[100],
                     valueColor: AlwaysStoppedAnimation(
-                      currentTheme.isDarkTheme()?
+                      indicador
+                      ?currentTheme.isDarkTheme()?
                       (descanso?Colors.pink[600]
                       :Colors.cyan[800]) 
-                      : (descanso?Colors.pink[300]
-                      :Colors.lightBlueAccent[400])
+                      : (descanso?Colors.pink[400]
+                      :Colors.greenAccent[400])
+                      :Colors.blue
                       ), // Defaults to the current Theme's accentColor.
                     borderColor: Colors.transparent,
                     borderWidth: 5.0,
@@ -605,6 +634,7 @@ class _HomePageState extends State<HomePage> {
     :Container(
       child: Column(
             children: [
+              
               SizedBox(height: 30,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -620,15 +650,7 @@ class _HomePageState extends State<HomePage> {
                       value: (min10*10+min).toDouble(),
                       min: 0,
                       max: 90,
-                      activeColor: currentTheme.isDarkTheme()
-                      ?(indicador
-                        ?(descanso?Colors.pink[600]
-                          :Colors.cyan[800])
-                        :Colors.blue[400])
-                      :(indicador
-                        ?(descanso?Colors.pink[300]
-                          :Colors.lightBlueAccent[400])
-                        :Colors.blue[100]),
+                      activeColor: Colors.blue,
                       onChanged: (newValue){
                         setState(() {
                           tiempopom=newValue.toInt();
@@ -682,15 +704,7 @@ class _HomePageState extends State<HomePage> {
                   editar
                   ?FloatingActionButton(
                     mini: true,
-                    backgroundColor: currentTheme.isDarkTheme()
-                      ?(indicador
-                        ?(descanso?Colors.pink[600]
-                          :Colors.cyan[800])
-                        :Colors.blue[400])
-                      :(indicador
-                        ?(descanso?Colors.pink[300]
-                          :Colors.lightBlueAccent[400])
-                        :Colors.blue[100]),
+                    backgroundColor: Colors.blue,
                       //isActive?Icons.pause:Icons.play_arrow
                     child: Icon(Icons.check,
                         color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
@@ -708,7 +722,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   SizedBox(
                     height: 50,
-                    child: Icon(MisIconos.hot_coffee,color: currentTheme.isDarkTheme()?Colors.white:Colors.black)
+                    child: Icon(MisIconos.cup_of_drink,color: currentTheme.isDarkTheme()?Colors.white:Colors.black)
                   ),
                   SizedBox(
                     height: 50,
@@ -717,15 +731,7 @@ class _HomePageState extends State<HomePage> {
                       value: (d_min10*10+d_min).toDouble(),
                       min: 0,
                       max: 30,
-                      activeColor: currentTheme.isDarkTheme()
-                      ?(indicador
-                        ?(descanso?Colors.pink[600]
-                          :Colors.cyan[800])
-                        :Colors.blue[400])
-                      :(indicador
-                        ?(descanso?Colors.pink[300]
-                          :Colors.lightBlueAccent[400])
-                        :Colors.blue[100]),
+                      activeColor: Colors.blue,
                       onChanged: (newValue){
                         setState(() {
                           tiempodescanso=newValue.toInt();
@@ -779,15 +785,7 @@ class _HomePageState extends State<HomePage> {
                   editar2
                   ?FloatingActionButton(
                     mini: true,
-                    backgroundColor: currentTheme.isDarkTheme()
-                      ?(indicador
-                        ?(descanso?Colors.pink[600]
-                          :Colors.cyan[800])
-                        :Colors.blue[400])
-                      :(indicador
-                        ?(descanso?Colors.pink[300]
-                          :Colors.lightBlueAccent[400])
-                        :Colors.blue[100]),
+                    backgroundColor: Colors.blue,
                       //isActive?Icons.pause:Icons.play_arrow
                     child: Icon(Icons.check,
                         color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
@@ -840,17 +838,20 @@ class _HomePageState extends State<HomePage> {
                       ?(indicador
                         ?(descanso?Colors.pink[600]
                           :Colors.cyan[800])
-                        :Colors.blue[400])
+                        :Colors.blue)
                       :(indicador
-                        ?(descanso?Colors.pink[300]
-                          :Colors.lightBlueAccent[400])
-                        :Colors.blue[100]),
+                        ?(descanso?Colors.pink[400]
+                          :Colors.greenAccent[400])
+                        :Colors.blue),
                       //isActive?Icons.pause:Icons.play_arrow
                       child: Icon(
-                        indicador?Icons.skip_next:Icons.play_arrow,
+                        indicador?(pausado?Icons.play_arrow:Icons.pause):Icons.play_arrow,
                         color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
                         onPressed: () {
-                            indicador?setState(nextPomodoro):setState(enPlay);
+                            indicador
+                            // ignore: unnecessary_statements
+                            ?(pausado?setState(enContinuacion):setState(enPausa))
+                            :setState(enPlay);
                           },
                     ),
                     SizedBox(
@@ -859,16 +860,12 @@ class _HomePageState extends State<HomePage> {
 
                     indicador?FloatingActionButton(
                       backgroundColor: currentTheme.isDarkTheme()
-                      ?(indicador
-                        ?(descanso?Colors.pink[600]
+                      ?(descanso?Colors.pink[600]
                           :Colors.cyan[800])
-                        :Colors.blue[400])
-                      :(indicador
-                        ?(descanso?Colors.pink[300]
-                          :Colors.lightBlueAccent[400])
-                        :Colors.blue[100]),
+                      :(descanso?Colors.pink[400]
+                          :Colors.greenAccent[400]) ,
                       child: Icon(
-                        !indicador?Icons.charging_station_rounded:Icons.stop,
+                        Icons.stop,
                         color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
                       ),
                       onPressed: () {
@@ -913,50 +910,15 @@ class _HomePageState extends State<HomePage> {
                         :Colors.cyan[800]
                         )
                       :(
-                        descanso?Colors.pink[300]
-                        :Colors.lightBlueAccent[400]
+                        descanso?Colors.pink[400]
+                        :Colors.greenAccent[400]
                         ),
                     ),
                   ) 
                 ):Container(),
-
-                SizedBox(
-                      height: indicador?20.0:0,
-                    ),
-                !indicador?Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FloatingActionButton(
-                      child: Icon(
-                        Icons.arrow_circle_up_rounded,
-                        color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
-                      ),
-                      backgroundColor:
-                          currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
-                      elevation: 0,
-                      highlightElevation: 0,
-                      onPressed: () {
-                            setState(incPom);
-                          },
-                    ),
-                    SizedBox(
-                      width: 30.0,
-                    ),
-                    FloatingActionButton(
-                      child: Icon(
-                        Icons.arrow_circle_down_rounded,
-                        color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,
-                      ),
-                      backgroundColor:
-                          currentTheme.isDarkTheme() ? Colors.blue[400] : Colors.blue[100],
-                      elevation: 0,
-                      highlightElevation: 0,
-                      onPressed: () {
-                            setState(decPom);
-                          },
-                    ),
-                  ],
-                ):Container(),
+                //sliderRotableFunc(0,5,5,0,maxpom,40,30),
+                //SliderLabelWidget(),
+                
               ],
             ),
           ],
@@ -966,62 +928,118 @@ class _HomePageState extends State<HomePage> {
       //CANTIDAD DE POMODOROS
       bottomNavigationBar: BottomAppBar(
         color: currentTheme.isDarkTheme()
-                  ?(indicador
-                    ?(descanso?Colors.pink[600]
-                      :Colors.cyan[800])
-                    :Colors.black12)
+                  ?Colors.black12
                   :(indicador
-                    ?(descanso?Colors.pink[300]
-                      :Colors.lightBlueAccent[400])
+                    ?(descanso?Colors.pink[400]
+                      :Colors.greenAccent[400])
                     :Colors.blue[100]),
         child: Container(
-          height: 80,
-          child: Row(
+          height: 70,
+          child: /*indicador?*/
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              /*Text(
-                "Pomodoros: ",
-                style: TextStyle(
-                  color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+              Center(
+                child: SliderTheme(
+                  data: SliderThemeData(
+                  trackHeight: 70,
+                  thumbShape: SliderComponentShape.noOverlay,
+                  overlayShape: SliderComponentShape.noOverlay,
+                  valueIndicatorShape: SliderComponentShape.noOverlay,
+                  trackShape: RectangularSliderTrackShape(),
+                  /// ticks in between
+                  //activeTickMarkColor: Colors.transparent,
+                  //inactiveTickMarkColor: Colors.transparent,
+                  
                 ),
-              ),*/
-              Slider(
-                value: maxpom.toDouble(),
-                min: 0,
-                max: 5,
-                divisions: 6, 
-                onChanged: (newvalue){
-                  setState((){
-                    maxpom=newvalue.toInt();
-                  });
-                }
+                child: Container(
+                  height: 70,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            RotatedBox(
+                              quarterTurns: 0,
+                              child: Slider(
+                                
+                                value: maxpom.toDouble(),
+                                min: 0,
+                                max: 5,
+                                divisions: 5,
+                                activeColor: currentTheme.isDarkTheme()
+                                ?(indicador
+                                  ?(descanso
+                                    ?Colors.pink[600]
+                                    :Colors.cyan[800])
+                                  :Colors.blue)
+                                :(indicador
+                                  ?(descanso
+                                    ?Colors.pink[400]
+                                    :Colors.greenAccent[400])
+                                  :Colors.blue),
+                                inactiveColor: currentTheme.isDarkTheme()
+                                  ?Colors.black12
+                                  :(indicador
+                                    ?(descanso?Colors.pink[300]
+                                      :Colors.greenAccent[100])
+                                    :Colors.blue[100]),
+                                //label: maxpom.round().toString(),
+                                onChanged: (value){
+                                  setState(() {
+                                    setPomodoros(value.toInt());
+                                  });
+                                },
+                              ),
+                            ),
+                            Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children:[ 
+                                  SizedBox(
+                                    height: 70,
+                                    width: 60,
+                                    child: IconButton(onPressed: (){ setState(decPom);}, 
+                                    icon: Icon(Icons.remove),
+                                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+                                    iconSize: 40),
+                                  ),
+                                  Expanded(
+                                    child: Center(
+                                      child: Text(indicador
+                                        ?'Restantes: $maxpom'
+                                        :'Repeticiones: $maxpom',
+                                        style: TextStyle(
+                                          color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 70,
+                                    width: 60,
+                                    child: IconButton(onPressed: (){ setState(incPom);}, 
+                                    icon: Icon(Icons.add),
+                                    color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
+                                    iconSize: 40),
+                                  ),
+                                ]
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //const SizedBox(height: 16),
+
+                    ],
+                  ),
                 ),
-                /*
-              maxpom>0?IconButton(
-                  icon: Icon(Icons.bolt),
-                  onPressed: () {},
-                  color:
-                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50):Container(), 
-              maxpom>1?IconButton(
-                  icon: Icon(Icons.bolt),
-                  onPressed: () {},
-                  color:
-                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50):Container(),
-              maxpom>2?IconButton(
-                  icon: Icon(Icons.bolt),
-                  onPressed: () {},
-                  color:
-                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50):Container(),
-              maxpom>3?IconButton(
-                  icon: Icon(Icons.bolt),
-                  onPressed: () {},
-                  color:
-                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50):Container(),
-              maxpom>4?IconButton(
+              ),
+              )
+
+              /*maxpom>4?IconButton(
                   icon: Icon(Icons.bolt),
                   onPressed: () {},
                   color:
@@ -1029,8 +1047,9 @@ class _HomePageState extends State<HomePage> {
                   iconSize: 50):Container(),
                   */
             ],
-          ),
-        ),
+          )
+          
+        )
       ),
     );
   }
