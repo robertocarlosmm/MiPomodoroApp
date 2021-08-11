@@ -141,7 +141,7 @@ class _HomePageState extends State<HomePage> {
     StopTimer();
     if(!descanso){//estaba en modo pomodoro
       contador++;
-      if(maxpom>1)maxpom--;
+      if(maxpom>0)maxpom--;
     }
     descanso=!descanso;
     descanso?valorDescanso():devuelveValor();
@@ -149,6 +149,8 @@ class _HomePageState extends State<HomePage> {
         devuelveValor();
         indicador=false;
         descanso=false;
+        pausado=false;
+        maxpom=1;
       }
     else{
       _start=indicador?(descanso?tiempodescanso:tiempopom):0;
@@ -224,7 +226,7 @@ class _HomePageState extends State<HomePage> {
 
   decPom(){
     if(indicador)return;
-    (maxpom>1)?maxpom--:maxpom=1;
+    if(maxpom>1)maxpom--;
   }
 
   incSeg() {
@@ -302,6 +304,7 @@ class _HomePageState extends State<HomePage> {
 
   setPomodoros(int num){
     int temp;
+    if(num==0)num=1;
     temp=maxpom;
     if(!indicador) temp=num;
     maxpom=temp;
@@ -484,6 +487,13 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final Size tam = MediaQuery.of(context).size;
+    double ancho=tam.width;
+    double alto =tam.height;
+    double circulo=alto*2/5;
+    if(circulo > ancho*4/5)
+      circulo=ancho*4/5;
+      
     final currentTheme = Provider.of<ThemeProvider>(context);
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return Scaffold(
@@ -542,11 +552,11 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(
-                  height: 15,
+                  height: alto/20,
                 ),
                 SizedBox(
-                  height: 280.0,
-                  width:  280.0,
+                  height: circulo,
+                  width:  circulo,
                   child: LiquidCircularProgressIndicator(
                     value: percent, // Defaults to 0.5.
                     backgroundColor: currentTheme.isDarkTheme() ? Colors.black12 : Colors.grey[100],
@@ -565,106 +575,122 @@ class _HomePageState extends State<HomePage> {
                     center: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      TextButton(
-                        onPressed: () {
-                          if(!indicador)setState(incMin10);
-                        },
-                        child: Text(
-                          '$min10',
-                          style: TextStyle(
-                            fontSize: 30.0,
-                            color: currentTheme.isDarkTheme()
-                                ? Colors.white
-                                : Colors.black,
-                          ),
-                        ),
-                      ),
-                      TextButton(
+                      SizedBox(
+                        width: circulo/5,
+                        child: TextButton(
                           onPressed: () {
-                            if(!indicador)setState(incMin);
+                            if(!indicador)setState(incMin10);
                           },
                           child: Text(
-                            '$min',
+                            '$min10',
                             style: TextStyle(
-                              fontSize: 30.0,
+                              fontSize: circulo*3/28,
                               color: currentTheme.isDarkTheme()
                                   ? Colors.white
                                   : Colors.black,
                             ),
-                          )),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: circulo/5,
+                        child: TextButton(
+                            onPressed: () {
+                              if(!indicador)setState(incMin);
+                            },
+                            child: Text(
+                              '$min',
+                              style: TextStyle(
+                                fontSize: circulo*3/28,
+                                color: currentTheme.isDarkTheme()
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            )),
+                      ),
                       Text(':',style: TextStyle(
-                            fontSize: 30.0,
+                            fontSize: circulo*3/28,
                             color: currentTheme.isDarkTheme()
                               ? Colors.white
                               : Colors.black,
                             ),
                           ),
-                      TextButton(
-                          onPressed: () {
-                            if(!indicador)setState(incSeg10);
-                          },
-                          child: Text(
-                            '$seg10',
-                            style: TextStyle(
-                              fontSize: 30.0,
-                              color: currentTheme.isDarkTheme()
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                          )),
-                      TextButton(
-                          onPressed: () {
-                            if(!indicador)setState(incSeg);
-                          },
-                          child: Text(
-                            '$seg',
-                            style: TextStyle(
-                              fontSize: 30.0,
-                              color: currentTheme.isDarkTheme()
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                          )),
+                      SizedBox(
+                        width: circulo/5,
+                        child: TextButton(
+                            onPressed: () {
+                              if(!indicador)setState(incSeg10);
+                            },
+                            child: Text(
+                              '$seg10',
+                              style: TextStyle(
+                                fontSize: circulo*3/28,
+                                color: currentTheme.isDarkTheme()
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            )),
+                      ),
+                      SizedBox(
+                        width: circulo/5,
+                        child: TextButton(
+                            onPressed: () {
+                              if(!indicador)setState(incSeg);
+                            },
+                            child: Text(
+                              '$seg',
+                              style: TextStyle(
+                                fontSize: circulo*3/28,
+                                color: currentTheme.isDarkTheme()
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            )),
+                      ),
                     ],
                   ),
                   ),
                 ),
                 //ACA IRA LA RUEDITA
                 
-                indicador
+    indicador
     ?Container()
     :Container(
       child: Column(
             children: [
               
-              SizedBox(height: 30,),
+              SizedBox(height: alto/40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(width: ancho/30,),
                   SizedBox(
-                    height: 50,
+                    height:alto/15,
+                    width: alto/15,
                     child: Icon(MisIconos.mind,color: currentTheme.isDarkTheme()?Colors.white:Colors.black)
                   ),
-                  SizedBox(
-                    height: 50,
-                    width: 200,
-                    child:Slider(
-                      value: (min10*10+min).toDouble(),
-                      min: 0,
-                      max: 90,
-                      activeColor: Colors.blue,
-                      onChanged: (newValue){
-                        setState(() {
-                          tiempopom=newValue.toInt();
-                          setPom(tiempopom);
-                                          });
-                      },
-                    ),
-                  ),
+                  
+                      SizedBox(
+                        height: alto/15,
+                        width: ancho*0.51,
+                        child:Slider(
+                          value: (min10*10+min).toDouble(),
+                          min: 0,
+                          max: 90,
+                          activeColor: Colors.blue,
+                          onChanged: (newValue){
+                            setState(() {
+                              tiempopom=newValue.toInt();
+                              setPom(tiempopom);
+                                              });
+                          },
+                        ),
+                      ),
+                    
                   
                   SizedBox(
-                    width: 50,
-                    height: 50,
+                    width: alto/15,
+                    height: alto/15,
                     child:editar
                     ?TextField(
                     decoration: InputDecoration(
@@ -672,6 +698,7 @@ class _HomePageState extends State<HomePage> {
                       //labelText: 'Minutos',
                       //prefixIcon: Icon(Icons.charging_station_rounded),
                       border: OutlineInputBorder(),
+                      focusColor:Colors.blue,
                     ),
                     keyboardAppearance: currentTheme.isDarkTheme()?Brightness.dark:Brightness.light,
                     keyboardType: TextInputType.number,
@@ -691,7 +718,7 @@ class _HomePageState extends State<HomePage> {
                       child: Text(
                         "${min10*10+min}",
                         style: TextStyle(
-                          fontSize: 25,
+                          fontSize: alto/31,
                           color: currentTheme.isDarkTheme()?Colors.white:Colors.black,
                         ),
                       ),
@@ -716,19 +743,24 @@ class _HomePageState extends State<HomePage> {
                                         });
                     }
                     )
-                  :Container()
+                  :Container(),
+                  SizedBox(width: ancho/20),
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: 50,
+                    width: ancho/30,
+                  ),
+                  SizedBox(
+                    height: alto/15,
+                    width: alto/15,
                     child: Icon(MisIconos.cup_of_drink,color: currentTheme.isDarkTheme()?Colors.white:Colors.black)
                   ),
                   SizedBox(
-                    height: 50,
-                    width: 200,
+                    height: alto/15,
+                    width: ancho*0.51,
                     child:Slider(
                       value: (d_min10*10+d_min).toDouble(),
                       min: 0,
@@ -744,8 +776,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                   
                   SizedBox(
-                    width: 50,
-                    height: 50,
+                    width: alto/15,
+                    height: alto/15,
                     child:editar2
                     ?TextField(
                     decoration: InputDecoration(
@@ -772,7 +804,7 @@ class _HomePageState extends State<HomePage> {
                       child: Text(
                         "${d_min10*10+d_min}",//buscame
                         style: TextStyle(
-                          fontSize: 25,
+                          fontSize: alto/31,
                           color: currentTheme.isDarkTheme()?Colors.white:Colors.black,
                         ),
                       ),
@@ -797,7 +829,8 @@ class _HomePageState extends State<HomePage> {
                                         });
                     }
                     )
-                  :Container()
+                  :Container(),
+                  SizedBox(width: ancho/20),
                 ],
               ),
             ],
@@ -805,36 +838,15 @@ class _HomePageState extends State<HomePage> {
     ),
 
                 SizedBox(
-                      height: 30.0,
+                      height: indicador?alto/30:alto/90,
                     ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [/*
-                    !indicador?FloatingActionButton(
-                      backgroundColor: currentTheme.isDarkTheme()
-                      ?(indicador
-                        ?(descanso?Colors.pink[600]
-                          :Colors.cyan[800])
-                        :Colors.blue[400])
-                      :(indicador
-                        ?(descanso?Colors.pink[300]
-                          :Colors.lightBlueAccent[400])
-                        :Colors.blue[100]),
-                      //isActive?Icons.pause:Icons.play_arrow
-                      child: Icon(Icons.hourglass_top_rounded,
-                        color: currentTheme.isDarkTheme() ? Colors.white : Colors.black ,),
-                        onPressed: () {
-                          
-                            muestraSlider(context);               
-                                                
-                          
-                          },
-                    ):Container(),*/
-
+                  children: [
                     SizedBox(
-                      width: !indicador?30.0:0,
+                      width: !indicador?alto/30:0,
                     ),
-
+                    
                     FloatingActionButton(
                       backgroundColor: currentTheme.isDarkTheme()
                       ?(indicador
@@ -857,7 +869,7 @@ class _HomePageState extends State<HomePage> {
                           },
                     ),
                     SizedBox(
-                      width: 30.0,
+                      width: alto/30,
                     ),
 
                     indicador?FloatingActionButton(
@@ -878,34 +890,30 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
 
-                SizedBox(
-                      height: 6.0,
-                    ),
-                
-                indicador?SizedBox(height: 30.0):Container(),
+                indicador?SizedBox(height: alto/30):Container(),
 
                 SizedBox(
-                  height: 40.0,
+                  height: alto/20,
                   child: indicador?Text(
                     descanso?"¡¡TE GANASTE UN BREAK!!":"¡¡NO VEAS TU CELULAR!!",
                     style: TextStyle(
                       color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                      fontSize: 27.0
+                      fontSize: alto/30
                     ),
                   ):Container()
                 ),
 
                 SizedBox(
-                      height: indicador?20.0:0,
+                      height: indicador?alto/80:0,
                     ),
 
                 indicador?SizedBox(
-                  height: 55.0,
-                  width:  55.0,
+                  height: alto/17,
+                  width:  alto/17,
                   child:Center(
                     child: Icon(
                     descanso?Icons.celebration:Icons.no_cell_rounded,
-                    size: 55.0,
+                    size: alto/17,
                     color: currentTheme.isDarkTheme()
                       ?(
                         descanso?Colors.pink[600]
@@ -1014,7 +1022,7 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(
                                           color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 24,
+                                          fontSize: alto/30,
                                         ),
                                       ),
                                     ),
@@ -1040,14 +1048,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               )
-
-              /*maxpom>4?IconButton(
-                  icon: Icon(Icons.bolt),
-                  onPressed: () {},
-                  color:
-                      currentTheme.isDarkTheme() ? Colors.white : Colors.black,
-                  iconSize: 50):Container(),
-                  */
             ],
           )
           
