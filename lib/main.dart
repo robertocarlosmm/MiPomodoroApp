@@ -21,7 +21,6 @@ import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:wakelock/wakelock.dart';
 
-
 void main() async{
   runApp(MyApp());
 }
@@ -74,13 +73,14 @@ class _HomePageState extends State<HomePage> {
   double percent=0,segPercent=0;
   int valorPorcentaje=0,tiempodescanso=0,temporal=0;
   int d_min10=0, d_min=5, d_seg10=0, d_seg=0;
-  bool p_select=false,d_select=false;
   bool editar=false,editar2=false,pausado=false;
   bool tiempo1=true,tiempo2=false;
   @override
   void initState() {
     super.initState();
   }
+
+  
 
   Timer _timer;
   final player = AudioCache();
@@ -135,6 +135,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       Wakelock.enable();
     });
+    
     pausado=false;
     tiempopom=(min10*10+min)*60 + seg10*10+seg;
     tiempodescanso=(d_min10*10+d_min)*60 + d_seg10*10+d_seg;
@@ -329,36 +330,7 @@ class _HomePageState extends State<HomePage> {
     maxpom=temp;
   }
 
-  double currentSlider=0;
-  double temporal_pom=0;
-  prototipo(){
-    indicador
-    ?Container()
-    :Container(
-      child: Column(
-        children: [
-          
-          Row(
-            children: [
-              Slider(
-                value: (min10*10+min).toDouble(),
-                min: 10,
-                max: 90,
-                onChanged: (newValue){
-                  setState(() {
-                    tiempopom=newValue.toInt();
-                    setPom(tiempopom);
-                                    });
-                },
-              )
-            ],
-          ),
-          Row(),
-        ],
-      ),
-    );
-  }
-
+  /*double temporal_pom=0;
 
   muestraSlider(BuildContext context){
     showDialog(context: context,builder: (context)=>AlertDialog(
@@ -502,7 +474,7 @@ class _HomePageState extends State<HomePage> {
         )
       ],
     ));
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -522,7 +494,7 @@ class _HomePageState extends State<HomePage> {
           
       appBar: AppBar(
         title: Text(
-          indicador?(descanso?"   DESCANSANDO":"   CONCENTRADO"):"   Focusing time!}",
+          indicador?(descanso?"   DESCANSANDO":"   CONCENTRADO"):"   FOCUS TIME!",
           style: TextStyle(
             color: currentTheme.isDarkTheme() ? Colors.white : Colors.black,
           ),
